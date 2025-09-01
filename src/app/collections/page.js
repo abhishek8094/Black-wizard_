@@ -13,17 +13,18 @@ import { categories } from "../constant/constant";
 import { allProducts } from "../constant/constant";
 import Link from "next/link";
 import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../redux/slices/productSlice";
 
 import { useSearchParams } from "next/navigation";
 import { generateProductSlug } from "../utils/slugify";
 
 // Component that uses useSearchParams - to be wrapped in Suspense
 const CollectionsContent = () => {
+  const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const category = searchParams?.get("category");
-
   const [products, setProducts] = useState(allProducts);
-
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [sortBy, setSortBy] = useState("best-selling");
   const [layout, setLayout] = useState("grid");
@@ -31,6 +32,13 @@ const CollectionsContent = () => {
   const [priceRange, setPriceRange] = useState([0, 800]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const productsPerPage = 8;
+
+  const data = useSelector((state)=>state.product);
+  console.log("", data)
+
+  useEffect(() => {
+    dispatch(getProducts());
+  }, [dispatch]);
 
   useEffect(() => {
     let filtered = allProducts;
@@ -93,7 +101,10 @@ const CollectionsContent = () => {
           >
             <ol className="flex justify-center items-center space-x-1 sm:space-x-2">
               <li>
-                <Link href="/" className="flex items-center text-gray-600 font-bold">
+                <Link
+                  href="/"
+                  className="flex items-center text-gray-600 font-bold"
+                >
                   <FiHome className="mr-1 text-sm" /> Home
                 </Link>
               </li>
@@ -376,15 +387,13 @@ const ProductCard = ({ product, layout, slug }) => {
     <Link href={`/collections/products/${slug}`}>
       <div
         className={`bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
-          layout === "list" 
-            ? "flex flex-col sm:flex-row mb-6" 
-            : "mb-6 sm:mb-10"
+          layout === "list" ? "flex flex-col sm:flex-row mb-6" : "mb-6 sm:mb-10"
         }`}
       >
         <div
           className={`relative ${
-            layout === "list" 
-              ? "w-full sm:w-1/3 aspect-w-2 aspect-h-3" 
+            layout === "list"
+              ? "w-full sm:w-1/3 aspect-w-2 aspect-h-3"
               : "aspect-w-2 aspect-h-3"
           }`}
         >
@@ -397,7 +406,9 @@ const ProductCard = ({ product, layout, slug }) => {
             className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] object-cover"
           />
         </div>
-        <div className={`p-3 sm:p-4 ${layout === "list" ? "w-full sm:w-2/3" : ""}`}>
+        <div
+          className={`p-3 sm:p-4 ${layout === "list" ? "w-full sm:w-2/3" : ""}`}
+        >
           <h3 className="font-medium text-gray-900 mb-1 line-clamp-1 text-sm sm:text-base">
             {product.title}
           </h3>

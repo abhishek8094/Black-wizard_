@@ -12,41 +12,38 @@ const ExploreCollection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const { exploreData } = useSelector((state) => state.product);
+  console.log("hello", exploreData);
 
   useEffect(() => {
     dispatch(exploreCollection());
   }, [dispatch]);
 
-  // 🔹 Create dynamic categories from exploreData
+  // 🔹 Categories from object keys
   const categories = useMemo(() => {
-    if (!Array.isArray(exploreData) || exploreData.length === 0) return [];
-
-    const uniqueCategories = new Set();
-    exploreData.forEach((product) => {
-      if (product.category) {
-        uniqueCategories.add(product.category);
-      }
-    });
+    if (!exploreData || typeof exploreData !== "object") return [];
 
     return [
       { id: "all", name: "All" },
-      ...Array.from(uniqueCategories).map((cat) => ({
-        id: cat.toLowerCase().replace(/\s+/g, "-"), // safe ID
-        name: cat,
-      })),
+      ...Object.keys(exploreData)
+        .filter((cat) => cat !== "All")
+        .map((cat) => ({
+          id: cat.toLowerCase().replace(/\s+/g, "-"),
+          name: cat,
+        })),
     ];
   }, [exploreData]);
 
-  // 🔹 Filter products based on selected category
-  const filteredProducts = !Array.isArray(exploreData) ? [] : (
-    activeCategory === "all"
-      ? exploreData
-      : exploreData.filter(
-          (product) =>
-            product.category?.toLowerCase().replace(/\s+/g, "-") ===
-            activeCategory
-        )
-  );
+  // 🔹 Products based on category
+  const filteredProducts = useMemo(() => {
+    if (!exploreData || typeof exploreData !== "object") return [];
+
+    if (activeCategory === "all") {
+      return exploreData["All"] || [];
+    }
+
+    const categoryName = categories.find((c) => c.id === activeCategory)?.name;
+    return exploreData[categoryName] || [];
+  }, [exploreData, activeCategory, categories]);
 
   const handleProductClick = (product) => {
     const slug = generateProductSlug(product.name);
@@ -66,9 +63,9 @@ const ExploreCollection = () => {
 
       {/* Category Filter */}
       <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
-        {categories.map((category) => (
+        {categories.map((category, idx) => (
           <button
-            key={category.id}
+            key={idx}
             onClick={() => setActiveCategory(category.id)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               activeCategory === category.id
@@ -94,25 +91,21 @@ const ExploreCollection = () => {
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden">
               <Image
-                className="w-full aspect square object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105"
                 src={product.image}
-                alt={product.name}
+                alt={product.title}
                 width={500}
                 height={500}
                 quality={100}
               />
-              {product.tag && (
-                <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded">
-                  {product.tag}
-                </span>
-              )}
+              
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
             </div>
 
             {/* Product Info */}
             <div className="p-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
-                {product.name}
+                {product.title}
               </h3>
 
               <div className="flex items-center justify-between mb-3">
@@ -120,11 +113,7 @@ const ExploreCollection = () => {
                   <span className="text-xl font-bold text-gray-900">
                     Rs. {product.price}
                   </span>
-                  {product.originalPrice && (
-                    <span className="text-sm text-gray-500 line-through ml-2">
-                      Rs. {product.originalPrice}
-                    </span>
-                  )}
+                 
                 </div>
               </div>
             </div>
