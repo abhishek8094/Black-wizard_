@@ -1,11 +1,21 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { trendingProducts } from "@/app/constant/constant";
 import { generateProductSlug } from "@/app/utils/slugify";
+import { useDispatch } from "react-redux";
+import { trendingProduct } from "@/app/redux/slices/productSlice";
+import { useSelector } from "react-redux";
 
 export default function TrendingProducts() {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const {trendingProductData} = useSelector((state)=>state.product);
+  console.log("data",trendingProductData);
+
+  useEffect(() => {
+    dispatch(trendingProduct());
+  }, [dispatch]);
 
   const handleProductClick = (product) => {
     const slug = generateProductSlug(product.title);
@@ -24,33 +34,12 @@ export default function TrendingProducts() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingProducts.map((product) => (
+          {trendingProductData?.map((product) => (
             <div
               key={product.id}
               className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
-              {/* Tag Badge */}
-              {product.tag && (
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    {product.tag}
-                  </span>
-                </div>
-              )}
-
-              {/* Discount Badge */}
-              {product.originalPrice > product.price && (
-                <div className="absolute top-3 right-3 z-10">
-                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    {Math.round(
-                      ((product.originalPrice - product.price) /
-                        product.originalPrice) *
-                        100
-                    )}
-                    % OFF
-                  </span>
-                </div>
-              )}
+          
 
               {/* Product Images */}
               <div
@@ -58,12 +47,12 @@ export default function TrendingProducts() {
                 onClick={() => handleProductClick(product)}
               >
                 <img
-                  src={product.image1}
+                  src={product.image}
                   alt={product.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <img
-                  src={product.image2}
+                  src={product.subImg}
                   alt={product.title}
                   className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
@@ -90,11 +79,7 @@ export default function TrendingProducts() {
                     <span className="text-lg font-bold text-gray-900">
                       Rs. {product.price}
                     </span>
-                    {product.originalPrice > product.price && (
-                      <span className="text-sm text-gray-500 line-through ml-2">
-                        Rs. {product.originalPrice}
-                      </span>
-                    )}
+                    
                   </div>
                 </div>
               </div>

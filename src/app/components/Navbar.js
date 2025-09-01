@@ -11,7 +11,7 @@ import { useWishlist } from "../context/WishlistContext";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/app/utils/firebase";
 import { useAnnouncement } from "../context/AnnouncementContext";
-
+import { logout } from "../redux/slices/authSlice";
 
 export default function Navbar({ onShowHeaderView }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +29,11 @@ export default function Navbar({ onShowHeaderView }) {
   useEffect(() => {
     setWishlistCount(getWishlistCount());
   }, [wishlistItems, getWishlistCount]);
+
+
+  const handleLogOut = async () => {
+    await dispatch(logout());
+  };
 
   // Update cart count when cart items change
   useEffect(() => {
@@ -132,28 +137,31 @@ export default function Navbar({ onShowHeaderView }) {
                     className="absolute right-0  w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
                     onMouseEnter={() => setIsUserMenuOpen(true)}
                     onMouseLeave={() => setIsUserMenuOpen(false)}
-                    
                   >
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-500"></p>
-                      <Link href="/pages/orders" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                        setIsUserMenuOpen(false);
-                        
-                      }} >
+                      <Link
+                        href="/pages/orders"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                        }}
+                      >
                         Dashboard
                       </Link>
                       <p className="text-sm text-gray-400"></p>
-                      <Link href="/account/user-profile" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                        setIsUserMenuOpen(false);  
-                      }}>
+                      <Link
+                        href="/account/user-profile"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                        }}
+                      >
                         Addresses
                       </Link>
                     </div>
                     <button
-                      onClick={async () => {
-                        await signOut(auth);
-                        router.push("/");
-                      }}
+                      onClick={handleLogOut}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Log Out
