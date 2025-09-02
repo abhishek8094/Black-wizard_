@@ -9,8 +9,6 @@ import {
   FiHome,
   FiFilter,
 } from "react-icons/fi";
-import { categories } from "../constant/constant";
-import { allProducts } from "../constant/constant";
 import Link from "next/link";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,13 +17,10 @@ import { getProducts } from "../redux/slices/productSlice";
 import { useSearchParams } from "next/navigation";
 import { generateProductSlug } from "../utils/slugify";
 
-// Component that uses useSearchParams - to be wrapped in Suspense
 const CollectionsContent = () => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const category = searchParams?.get("category");
-  const [products, setProducts] = useState(allProducts);
-  const [filteredProducts, setFilteredProducts] = useState(products);
   const [sortBy, setSortBy] = useState("best-selling");
   const [layout, setLayout] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,17 +28,21 @@ const CollectionsContent = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const productsPerPage = 8;
 
-  const data = useSelector((state)=>state.product);
-  console.log("", data)
+  const { productsData } = useSelector((state) => state.product);
+  console.log("prody", productsData);
+  const [products, setProducts] = useState(productsData);
+  const [filteredProducts, setFilteredProducts] = useState(products);
 
   useEffect(() => {
     dispatch(getProducts());
   }, [dispatch]);
 
   useEffect(() => {
-    let filtered = allProducts;
+    let filtered = productsData ? [...productsData] : [];
     if (category) {
-      filtered = allProducts.filter((product) => product.category === category);
+      filtered = filtered.filter(
+        (product) => product.category === category
+      );
     }
 
     filtered = filtered.filter(
@@ -73,17 +72,20 @@ const CollectionsContent = () => {
 
     setFilteredProducts(result);
     setCurrentPage(1);
-  }, [category, sortBy, priceRange]);
+  }, [category, sortBy, priceRange, productsData]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
+  const currentProducts = filteredProducts?.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts?.length / productsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Get unique categories
+  const uniqueCategories = [...new Set(productsData?.map(product => product.category))];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,9 +120,9 @@ const CollectionsContent = () => {
           {/* Category Navigation */}
           <div className="overflow-x-auto py-2">
             <div className="flex space-x-4 sm:space-x-6 md:space-x-8 justify-start sm:justify-center whitespace-nowrap px-2">
-              {categories.map((cat, index) => (
+              {uniqueCategories?.map((cat, idx) => (
                 <Link
-                  key={index}
+                  key={idx}
                   href={`?category=${encodeURIComponent(cat)}`}
                   className={`text-xs sm:text-sm transition-colors duration-200 px-2 py-1 ${
                     category === cat
@@ -240,10 +242,10 @@ const CollectionsContent = () => {
                   : "space-y-4 sm:space-y-6"
               }
             >
-              {currentProducts.map((product) => (
+              {currentProducts?.map((product,idx) => (
                 <ProductCard
-                  slug={generateProductSlug(product.title)}
-                  key={product.id}
+                  slug={generateProductSlug(product._id)}
+                  key={idx}
                   product={product}
                   layout={layout}
                 />
@@ -398,8 +400,8 @@ const ProductCard = ({ product, layout, slug }) => {
           }`}
         >
           <Image
-            src={product.image}
-            alt={product.title}
+            src={product.imageUrl}
+            alt={product.name}
             width={500}
             height={500}
             quality={100}
@@ -410,7 +412,7 @@ const ProductCard = ({ product, layout, slug }) => {
           className={`p-3 sm:p-4 ${layout === "list" ? "w-full sm:w-2/3" : ""}`}
         >
           <h3 className="font-medium text-gray-900 mb-1 line-clamp-1 text-sm sm:text-base">
-            {product.title}
+            {product.name}
           </h3>
 
           <div className="mb-2 sm:mb-3">

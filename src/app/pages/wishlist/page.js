@@ -3,26 +3,34 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useWishlist } from "../../context/WishlistContext";
-import { useCart } from "../../context/CartContext";
+import { useSelector, useDispatch } from "react-redux";
 import { FaHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import {
+  selectWishlistItems,
+  selectIsInWishlist,
+  removeFromWishlist,
+} from "../../redux/slices/wishlistSlice";
+import {
+  selectCartItems,
+  addToCart,
+} from "../../redux/slices/cartSlice";
 
 export default function WishlistPage() {
-  const { wishlistItems, removeFromWishlist } = useWishlist();
-  const { addToCart, items } = useCart();
+  const wishlistItems = useSelector(selectWishlistItems);
+  const cartItems = useSelector(selectCartItems);
+  const dispatch = useDispatch();
 
   const handleAddToCart = (product) => {
-    // Check if product is already in cart
-    const existingItem = items.find(item => item.id === product.id);
-    
+    const existingItem = cartItems.find((item) => item.id === product.id);
+
     if (existingItem) {
       toast.error("Item already in the cart!");
       return;
     }
-    
-    addToCart(product);
-    removeFromWishlist(product.id);
+
+    dispatch(addToCart({ product, size: "M", quantity: 1 })); 
+    dispatch(removeFromWishlist(product.id));
     toast.success("Item moved to cart successfully!");
   };
 
@@ -65,16 +73,16 @@ export default function WishlistPage() {
             >
               <div className="relative">
                 <Image
-                  src={product.image}
-                  alt={product.title}
+                  src={product.imageUrl}
+                  alt={product.name}
                   width={300}
                   height={300}
                   className="w-full h-[400px] object-cover"
                 />
                 <button
                   onClick={() => {
-                    removeFromWishlist(product.id);
-                    toast.success("Item removed from the cart");
+                    dispatch(removeFromWishlist(product.id));
+                    toast.success("Item removed from the wishlist");
                   }}
                   className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
                   aria-label="Remove from wishlist"

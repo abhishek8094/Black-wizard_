@@ -5,9 +5,6 @@ import SessionProviderClient from "./components/SessionProviderClient";
 import "./globals.css";
 import Footer from "@/app/components/Footer";
 import AnnouncementBar from "@/app/components/AnnouncementBar";
-import { CartProvider } from "@/app/context/CartContext";
-import { WishlistProvider } from "@/app/context/WishlistContext";
-import { AnnouncementProvider } from "./context/AnnouncementContext";
 import Navbar from "./components/Navbar";
 import { Providers } from "./providers";
 
@@ -35,9 +32,7 @@ export default function RootLayout({ children }) {
       >
    <Providers>
         <SessionProviderClient>
-          <CartProvider>
-            <WishlistProvider>
-              <AnnouncementProvider>
+          
                 <AnnouncementBar/>
                 <Navbar />
                 {children}
@@ -54,9 +49,7 @@ export default function RootLayout({ children }) {
                   pauseOnHover
                   theme="light"
                 />
-              </AnnouncementProvider>
-            </WishlistProvider>
-          </CartProvider>
+             
         </SessionProviderClient>
       </Providers>
       </body>

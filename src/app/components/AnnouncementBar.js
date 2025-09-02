@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useAnnouncement } from "../context/AnnouncementContext";
+import { useSelector, useDispatch } from "react-redux";
+import { selectAnnouncementVisible, setAnnouncementVisible } from "../redux/slices/announcementSlice";
 
 export default function AnnouncementBar() {
-  const { isVisible, setIsVisible } = useAnnouncement();
+  const isVisible = useSelector(selectAnnouncementVisible);
+  const dispatch = useDispatch();
   const carouselRef = useRef(null);
   const flickityInstance = useRef(null);
 
   if (!isVisible) return null;
 
-  const handleDismiss = () => setIsVisible(false);
+  const handleDismiss = () => dispatch(setAnnouncementVisible(false));
 
   const [isClient, setIsClient] = useState(false);
 
@@ -24,7 +26,7 @@ export default function AnnouncementBar() {
     // Dynamically import Flickity only on client side
     import("flickity").then((Flickity) => {
       import("flickity/css/flickity.css");
-      
+
       flickityInstance.current = new Flickity.default(carouselRef.current, {
         cellAlign: "center",
         wrapAround: true,

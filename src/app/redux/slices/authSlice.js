@@ -112,6 +112,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     authData: null,
+    userData: null,
     status: null,
     loading: false,
     error: null,
@@ -120,6 +121,11 @@ const authSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.userData = action.payload;
+    },
+    clearAuth: (state) => {
+      state.authData = null;
+      state.userData = null;
+      state.status = null;
     },
   },
 
@@ -146,7 +152,6 @@ const authSlice = createSlice({
       .addCase(appLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.authData = action.payload;
-        doLogin(action.payload);
         state.error = null;
       })
 
@@ -196,5 +201,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
