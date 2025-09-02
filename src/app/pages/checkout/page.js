@@ -1,11 +1,13 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/app/context/CartContext";
+import { useSelector } from "react-redux";
+import { selectCartItems, selectTotalPrice } from "@/app/redux/slices/cartSlice";
 import { initiateRazorpayCheckout } from "@/app/utils/razorpay";
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice } = useCart();
+  const items = useSelector(selectCartItems);
+  const totalAmount = useSelector(selectTotalPrice);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,7 +17,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      const totalAmount = getTotalPrice();
       const response = await fetch("/api/razorpay", {
         method: "POST",
         headers: {
@@ -36,7 +37,7 @@ export default function CheckoutPage() {
     };
 
     handleCheckout();
-  }, [items, getTotalPrice, router]);
+  }, [items, totalAmount, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
