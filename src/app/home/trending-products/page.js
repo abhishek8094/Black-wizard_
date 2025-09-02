@@ -34,9 +34,9 @@ export default function TrendingProducts() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingProductData?.map((product) => (
+          {trendingProductData?.map((product,idx) => (
             <div
-              key={product.id}
+              key={idx}
               className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
           

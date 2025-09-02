@@ -24,6 +24,21 @@ export const getProducts = createAsyncThunk(
   }
 );
 
+export const getProductById = createAsyncThunk(
+  "product/getProductById",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await getRequest(`${API_ENDPOINTS.PRODUCTS}/${productId}`);
+      return response.data;
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch product"
+      );
+    }
+  }
+);
+
 export const productCategories = createAsyncThunk(
   "product/productCategories",
   async (_, { rejectWithValue }) => {
@@ -92,6 +107,7 @@ const productSlice = createSlice({
     trendingProductData: null,
     productCategorieData: null,
     productsData:null,
+    productData: null,
     loading: false,
     error: null,
   },
@@ -151,6 +167,17 @@ const productSlice = createSlice({
         state.trendingProductData = action.payload;
       })
       .addCase(trendingProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getProductById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProductById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productData = action.payload;
+      })
+      .addCase(getProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

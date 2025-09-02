@@ -1,52 +1,54 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { allProducts } from '@/app/constant/constant';
 import { FiHeart, FiShoppingCart, FiStar, FiTruck } from 'react-icons/fi';
 import Image from 'next/image';
-import { useCart } from '@/app/context/CartContext';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useWishlist } from '@/app/context/WishlistContext';
-import { generateProductSlug } from '@/app/utils/slugify';
 import { initiateRazorpayCheckout } from '@/app/utils/razorpay';
+import { getProductById } from '@/app/redux/slices/productSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectCartItems,
+  addToCart,
+} from '@/app/redux/slices/cartSlice';
+import {
+  selectWishlistItems,
+  addToWishlist,
+  removeFromWishlist,
+} from '@/app/redux/slices/wishlistSlice';
 
 export default function ProductDetailPage({ params }) {
+  const dispatch = useDispatch();
   const unwrappedParams = React.use(params);
-  const { productId: slug } = unwrappedParams;
-  const [product, setProduct] = useState(null);
+  const { productId } = unwrappedParams;
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+  const { productData } = useSelector((state) => state.product);
+  const cartItems = useSelector(selectCartItems);
+  const wishlistItems = useSelector(selectWishlistItems);
 
   useEffect(() => {
-    const foundProduct = allProducts.find(p => generateProductSlug(p.title) === slug);
-    if (foundProduct) {
-      // Ensure all required properties have fallback values
-      const productWithDefaults = {
-        ...foundProduct,
-        images: foundProduct.images || [foundProduct.image],
-        size: foundProduct.size || ['S', 'M', 'L', 'XL'],
-        rating: foundProduct.rating || 4.0,
-        reviews: foundProduct.reviews || 0,
-        originalPrice: foundProduct.originalPrice || foundProduct.price,
-        inStock: foundProduct.inStock !== undefined ? foundProduct.inStock : true
-      };
-      setProduct(productWithDefaults);
-      setSelectedSize(productWithDefaults.size[0]);
-      setSelectedImage(productWithDefaults.image);
+    dispatch(getProductById(productId));
+  }, [dispatch, productId]);
+
+  useEffect(() => {
+    if (productData) {
+      setSelectedSize(productData.size ? productData.size[0] : '');
+      setSelectedImage(productData.images ? productData.images[0] : '');
     }
-  }, [slug]);
+  }, [productData]);
 
   // Update isWishlisted state when product or wishlist changes
   useEffect(() => {
-    if (product) {
-      setIsWishlisted(isInWishlist(product.id));
+    if (productData) {
+      setIsWishlisted(wishlistItems.some((item) => item.id === productData.id));
     }
-  }, [product]);
+  }, [productData, wishlistItems]);
 
-  if (!product) {
+  if (!productData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-xl text-gray-600">Product not found</p>
@@ -54,41 +56,38 @@ export default function ProductDetailPage({ params }) {
     );
   }
 
-  const { addToCart, items } = useCart();
-  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  
   const handleAddToCart = () => {
-    const existingItem = items.find(item => 
-      item.id === product.id && item.size === selectedSize
+    const existingItem = cartItems.find(item =>
+      item.id === productData.id && item.size === selectedSize
     );
 
     if (existingItem) {
       toast.error("Item already in the cart!");
       return;
     }
-    addToCart(product, selectedSize, quantity);
+    dispatch(addToCart({ product: productData, size: selectedSize, quantity }));
     toast.success("Item added to cart successfully!");
   };
 
   const handleWishlistToggle = () => {
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
+    if (wishlistItems.some((item) => item.id === productData.id)) {
+      dispatch(removeFromWishlist(productData.id));
       setIsWishlisted(false);
     } else {
-      addToWishlist(product);
+      dispatch(addToWishlist(productData));
       setIsWishlisted(true);
     }
   };
 
   const handleBuyNow = async () => {
-    const amount = product.price * quantity;
+    const amount = productData.price * quantity;
     const response = await fetch("/api/razorpay", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        product: product,
+        product: productData,
         selectedSize: selectedSize,
         quantity: quantity,
         amount: amount,
@@ -103,7 +102,6 @@ export default function ProductDetailPage({ params }) {
     }
   };
 
-  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,15 +111,15 @@ export default function ProductDetailPage({ params }) {
           <div className="space-y-4">
             <div className=" w-full aspect-square overflow-hidden rounded-lg bg-gray-200">
               <Image
-                src={selectedImage || product.image}
-                alt={product.title}
+                src={productData.imageUrl}
+                alt={productData.name}
                 width={600}
                 height={600}
                 className="w-full object-cover object-center"
               />
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {product.images?.map((image, index) => (
+              {productData.images?.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(image)}
@@ -131,7 +129,7 @@ export default function ProductDetailPage({ params }) {
                 >
                   <Image
                     src={image}
-                    alt={`${product.title} ${index + 1}`}
+                    alt={`${productData.title} ${index + 1}`}
                     width={100}
                     height={100}
                     className="h-full w-full object-cover"
@@ -145,41 +143,41 @@ export default function ProductDetailPage({ params }) {
           <div className="space-y-6">
             {/* Title and Rating */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{productData.name}</h1>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <FiStar
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(product.rating || 4) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${i < Math.floor(productData.rating || 4) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">({product.reviews || 0} reviews)</span>
+                <span className="text-sm text-gray-600">({productData.reviews || 0} reviews)</span>
               </div>
             </div>
 
             {/* Price */}
             <div className="flex items-center space-x-3">
-              <span className="text-3xl font-bold text-gray-900">₹{product.price}</span>
-              {product.originalPrice > product.price && (
+              <span className="text-3xl font-bold text-gray-900">₹{productData.price}</span>
+              {productData.originalPrice > productData.price && (
                 <>
-                  <span className="text-xl text-gray-500 line-through">₹{product.originalPrice}</span>
+                  <span className="text-xl text-gray-500 line-through">₹{productData.originalPrice}</span>
                   <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">
-                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                    {Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}% OFF
                   </span>
                 </>
               )}
             </div>
 
             {/* Description */}
-            <p className="text-gray-600">{product.description}</p>
+            <p className="text-gray-600">{productData.description}</p>
 
             {/* Size Selection */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-2">Size</h3>
               <div className="flex flex-wrap gap-2">
-                {product.size.map(size => (
+                {productData?.size?.map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -250,7 +248,7 @@ export default function ProductDetailPage({ params }) {
                 </li>
                 <li className="flex items-center">
                   <FiStar className="w-4 h-4 mr-2 text-yellow-600" />
-                  {product.rating} star rating
+                  {productData.rating} star rating
                 </li>
                 <li className="flex items-center">
                   <FiShoppingCart className="w-4 h-4 mr-2 text-blue-600" />

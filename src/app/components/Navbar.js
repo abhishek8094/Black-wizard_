@@ -6,39 +6,37 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaUser, FaHeart } from "react-icons/fa6";
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
+import { useSelector, useDispatch } from "react-redux";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/app/utils/firebase";
-import { useAnnouncement } from "../context/AnnouncementContext";
 import { logout } from "../redux/slices/authSlice";
+import {
+  selectCartItems,
+  selectTotalItems,
+} from "../redux/slices/cartSlice";
+import {
+  selectWishlistItems,
+  selectWishlistCount,
+} from "../redux/slices/wishlistSlice";
+import { selectAnnouncementVisible } from "../redux/slices/announcementSlice";
 
 export default function Navbar({ onShowHeaderView }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [cartItemsCount, setCartItemsCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
-  const { getTotalItems, items: cartItems } = useCart();
-  const { getWishlistCount, wishlistItems } = useWishlist();
-  const { isVisible } = useAnnouncement();
+  const dispatch = useDispatch();
 
-  // Update wishlist count when wishlist items change
-  useEffect(() => {
-    setWishlistCount(getWishlistCount());
-  }, [wishlistItems, getWishlistCount]);
-
+  const cartItems = useSelector(selectCartItems);
+  const cartItemsCount = useSelector(selectTotalItems);
+  const wishlistItems = useSelector(selectWishlistItems);
+  const wishlistCount = useSelector(selectWishlistCount);
+  const isVisible = useSelector(selectAnnouncementVisible);
 
   const handleLogOut = async () => {
     await dispatch(logout());
   };
-
-  // Update cart count when cart items change
-  useEffect(() => {
-    setCartItemsCount(getTotalItems());
-  }, [cartItems, getTotalItems]);
 
   const totalCartItems = cartItemsCount;
 
