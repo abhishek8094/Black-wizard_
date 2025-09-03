@@ -20,10 +20,16 @@ const wishlistSlice = createSlice({
       if (!existingItem) {
         state.items.push(product);
       }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("wishlist", JSON.stringify(state.items));
+      }
     },
     removeFromWishlist: (state, action) => {
       const productId = action.payload;
       state.items = state.items.filter((item) => item.id !== productId);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("wishlist", JSON.stringify(state.items));
+      }
     },
   },
 });

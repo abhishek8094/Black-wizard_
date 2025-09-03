@@ -4,31 +4,15 @@ import { FaEdit } from "react-icons/fa";
 import { FiPlus, FiInfo } from "react-icons/fi";
 import EditProfileModal from "@/app/components/EditProfileModal";
 import AddressModal from "@/app/components/AddressModal";
-import { auth } from "@/app/utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { useSelector } from "react-redux";
 
 const UserProfile = () => {
   const addresses = [];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("No name added");
+  const userEmail = useSelector((state) => state.auth.userData?.email || "");
+  const userName = useSelector((state) => state.auth.userData?.name || "No name added");
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserEmail(user.email || "");
-        if (user.displayName) {
-          setUserName(user.displayName);
-        }
-      } else {
-        setUserEmail("");
-        setUserName("No name added");
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-8 py-20 ">

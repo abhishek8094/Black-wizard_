@@ -2,42 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/app/utils/firebase";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
 
 export default function AccountPage() {
   const router = useRouter();
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.auth.userData);
+  const loading = useSelector((state) => state.auth.loading);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in
-        setUserData({
-          name: user.displayName || "Not provided",
-          email: user.email,
-          createdAt: user.metadata.creationTime,
-          lastSignIn: user.metadata.lastSignInTime
-        });
-      } else {
-        // User is not signed in, redirect to login
-        router.push("/login");
-      }
-      setLoading(false);
-    });
-
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [router]);
+    if (!userData && !loading) {
+      router.push("/home/login");
+    }
+  }, [userData, loading, router]);
 
   const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      router.push("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    await dispatch(logout());
+    router.push("/");
   };
 
   if (loading) {
