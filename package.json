@@ -13,7 +13,7 @@
     "axios": "^1.6.2",
     "bcryptjs": "^3.0.2",
     "cookies": "^0.9.1",
-    "firebase": "^12.1.0",
+
     "flickity": "^3.0.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",

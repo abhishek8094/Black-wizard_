@@ -66,9 +66,9 @@ export default function WishlistPage() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2  pb-8 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {wishlistItems.map((product) => (
+          {wishlistItems.map((product,idx) => (
             <div
-              key={product.id}
+              key={idx}
               className="bg-white rounded-lg shadow-lg border border-gray-400 overflow-hidden"
             >
               <div className="relative">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { auth } from '@/app/utils/firebase'; // Import Firebase auth
+
 
 const EditProfileModal = ({ isOpen, onClose, email }) => {
   const [firstName, setFirstName] = useState('');

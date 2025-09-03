@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
       >
    <Providers>
         <SessionProviderClient>
-          
+
                 <AnnouncementBar/>
                 <Navbar />
                 {children}

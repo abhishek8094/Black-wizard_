@@ -5,7 +5,7 @@ import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { auth } from "@/app/utils/firebase";
+
 import { initiateRazorpayCheckout } from "@/app/utils/razorpay";
 import {
   selectCartItems,
@@ -21,8 +21,10 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  const currentUser = useSelector((state) => state.auth.userData);
+
   const handleCheckout = async () => {
-    const isLoggedIn = auth.currentUser !== null;
+    const isLoggedIn = currentUser !== null;
     if (isLoggedIn) {
       const response = await fetch("/api/razorpay", {
         method: "POST",

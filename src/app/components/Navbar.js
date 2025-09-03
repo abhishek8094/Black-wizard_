@@ -7,8 +7,7 @@ import Image from "next/image";
 import { FaUser, FaHeart } from "react-icons/fa6";
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "@/app/utils/firebase";
+
 import { logout } from "../redux/slices/authSlice";
 import {
   selectCartItems,
@@ -23,7 +22,7 @@ import { selectAnnouncementVisible } from "../redux/slices/announcementSlice";
 export default function Navbar({ onShowHeaderView }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -53,12 +52,8 @@ export default function Navbar({ onShowHeaderView }) {
     }
   }, [totalCartItems]);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  const currentUser = useSelector((state) => state.auth.userData);
+
 
   const navigation = [
     {
@@ -116,7 +111,7 @@ export default function Navbar({ onShowHeaderView }) {
               </Link>
             ))}
             {/* User Menu */}
-            {currentUser ? (
+              {currentUser ? (
               <div className="relative" ref={userMenuRef}>
                 <button
                   onMouseEnter={() => setIsUserMenuOpen(true)}
@@ -237,10 +232,7 @@ export default function Navbar({ onShowHeaderView }) {
               ))}
               {currentUser && (
                 <button
-                  onClick={async () => {
-                    await signOut(auth);
-                    router.push("/");
-                  }}
+                  onClick={handleLogOut}
                   className="w-full text-left px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                 >
                   Log Out
