@@ -10,7 +10,6 @@ import {
   FiFilter,
 } from "react-icons/fi";
 import Link from "next/link";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../redux/slices/productSlice";
 
@@ -399,7 +398,7 @@ const ProductCard = ({ product, layout, slug }) => {
               : "aspect-w-2 aspect-h-3"
           }`}
         >
-          <Image
+          <img
             src={product.imageUrl}
             alt={product.name}
             width={500}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { getCrousel } from "@/app/redux/slices/productSlice";
 
@@ -37,7 +36,7 @@ export default function CarouselPage() {
           <div className="relative overflow-hidden rounded-lg shadow-2xl">
             <div className="relative h-96 md:h-[500px] lg:h-[600px]">
               {data?.length > 0 && (
-                <Image
+                <img
                   src={data[currentIndex]} 
                   alt={`Slide ${currentIndex + 1}`}
                   fill

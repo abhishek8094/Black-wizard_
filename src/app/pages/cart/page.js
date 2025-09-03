@@ -2,7 +2,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -83,7 +82,7 @@ export default function CartPage() {
                   className="flex items-center p-6 border-b last:border-b-0"
                 >
                   <div className="bg-gray-200 rounded-lg overflow-hidden">
-                    <Image
+                    <img
                       src={item.imageUrl}
                       alt={item.name}
                       width={96}

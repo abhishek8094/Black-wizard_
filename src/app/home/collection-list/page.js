@@ -1,6 +1,4 @@
 "use client";
-
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,7 +26,7 @@ export default function CollectionsList() {
               className="group block bg-white shadow hover:shadow-lg transition rounded overflow-hidden"
             >
               <div className="aspect-square w-full">
-                <Image
+                <img
                   src={item.image}
                   alt={item.title}
                   width={500}
