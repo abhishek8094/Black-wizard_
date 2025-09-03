@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { FaHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -72,7 +71,7 @@ export default function WishlistPage() {
               className="bg-white rounded-lg shadow-lg border border-gray-400 overflow-hidden"
             >
               <div className="relative">
-                <Image
+                <img
                   src={product.imageUrl}
                   alt={product.name}
                   width={300}

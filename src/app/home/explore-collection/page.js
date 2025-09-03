@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { generateProductSlug } from "@/app/utils/slugify";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { exploreCollection } from "@/app/redux/slices/productSlice";
 
@@ -90,7 +89,7 @@ const ExploreCollection = () => {
           >
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden">
-              <Image
+              <img
                 className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105"
                 src={product.image}
                 alt={product.title}

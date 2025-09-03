@@ -2,14 +2,13 @@ import React from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
-import Image from "next/image";
 
 const Header = () => {
   return (
     <header className="flex items-center justify-between p-4 md:p-4 bg-white shadow-sm">
       <div className="flex gap-12 justify-center items-center">
         <Link href="/" className="flex items-center">
-          <Image src="/logo.jpeg" alt="Site Logo" width={80} height={45} />
+          <img src="/logo.jpeg" alt="Site Logo" width={80} height={45} />
         </Link>
 
         {/* Navigation */}

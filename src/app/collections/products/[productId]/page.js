@@ -2,7 +2,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { FiHeart, FiShoppingCart, FiStar, FiTruck } from 'react-icons/fi';
-import Image from 'next/image';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { initiateRazorpayCheckout } from '@/app/utils/razorpay';
@@ -110,7 +109,7 @@ export default function ProductDetailPage({ params }) {
           {/* Product Images */}
           <div className="space-y-4">
             <div className=" w-full aspect-square overflow-hidden rounded-lg bg-gray-200">
-              <Image
+              <img
                 src={productData.imageUrl}
                 alt={productData.name}
                 width={600}
@@ -127,7 +126,7 @@ export default function ProductDetailPage({ params }) {
                     selectedImage === image ? 'ring-2 ring-blue-600' : 'ring-1 ring-gray-200'
                   }`}
                 >
-                  <Image
+                  <img
                     src={image}
                     alt={`${productData.title} ${index + 1}`}
                     width={100}
