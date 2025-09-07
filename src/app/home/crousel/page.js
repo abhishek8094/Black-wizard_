@@ -39,9 +39,7 @@ export default function CarouselPage() {
                 <img
                   src={data[currentIndex]} 
                   alt={`Slide ${currentIndex + 1}`}
-                  fill
                   className="object-cover"
-                  priority
                 />
               )}
               <div className="absolute inset-0 bg-black bg-opacity-40"></div>

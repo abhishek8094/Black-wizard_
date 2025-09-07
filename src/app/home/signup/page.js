@@ -14,7 +14,7 @@ export default function SignupPage() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  // ✅ Yup validation schema
+  // validation 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Name must be at least 2 characters")
@@ -30,8 +30,7 @@ export default function SignupPage() {
       .required("Confirm Password is required"),
   });
 
-  // ✅ Handle signup with Redux
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values,{ resetForm }) => {
     setLoading(true);
     try {
       const result = await dispatch(
@@ -43,11 +42,13 @@ export default function SignupPage() {
       ).unwrap();
 
       if (result.success === true) {
+        router.push("/home/login")
+        resetForm();
         toast.success("Account created successfully!");
       }
     } catch (error) {
+      resetForm();
       console.error("Signup error:", error);
-      toast.error(error?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
