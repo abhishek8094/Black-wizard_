@@ -10,8 +10,10 @@ const UserProfile = () => {
   const addresses = [];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const userEmail = useSelector((state) => state.auth.userData?.email || "");
-  const userName = useSelector((state) => state.auth.userData?.name || "No name added");
+  const userDataFromRedux = useSelector((state) => state.auth.userData?.user);
+  const userDataFromStorage = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("userProfile") || "{}") : {};
+  const userEmail = userDataFromStorage.email || userDataFromRedux?.email || "";
+  const userName = userDataFromStorage.name || userDataFromRedux?.name || "No name added";
 
 
   return (
@@ -76,7 +78,7 @@ const UserProfile = () => {
           </ul>
         )}
       </section>
-      <EditProfileModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} email={userEmail} />
+      <EditProfileModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} email={userEmail} name={userName} />
       <AddressModal isOpen={isAddressModalOpen} onClose={() => setIsAddressModalOpen(false)} />
     </main>
   );

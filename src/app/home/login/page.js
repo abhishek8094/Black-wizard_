@@ -7,19 +7,36 @@ import "react-toastify/dist/ReactToastify.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { appLogin } from "@/app/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const route = useRouter()
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
 
-  // ✅ Form validation schema using Yup
+  //  validation
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().min(6, "At least 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "At least 6 characters")
+      .required("Password is required"),
   });
 
-  const handleGoogleSignIn = () => {
-    toast.error("Google sign-in is not implemented yet");
+  const handleSubmit = async (values,{resetForm}) => {
+    const result = await dispatch(appLogin(values));
+    if(result.type === "auth/appLogin/fulfilled"){
+      // Check if user role is admin and redirect accordingly
+      const userRole = result.payload?.user?.role;
+      if(userRole === "admin"){
+        route.push("/admin");
+      } else {
+        route.push("/account");
+      }
+    }
+    if (result.type === "auth/appLogin/rejected") {
+      toast.error(result.payload);
+      resetForm();
+    }
   };
 
   return (
@@ -27,13 +44,10 @@ export default function LoginPage() {
       <div className="max-w-md mx-auto p-6 border rounded shadow">
         <h1 className="text-2xl font-bold mb-4">Login</h1>
 
-        {/* ✅ Formik form */}
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            dispatch(appLogin(values)); 
-          }}
+          onSubmit={handleSubmit}
         >
           {({ isSubmitting }) => (
             <Form className="space-y-4">
@@ -75,11 +89,6 @@ export default function LoginPage() {
             </Form>
           )}
         </Formik>
-
-        {/* Error from Redux */}
-        {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
-
-      
 
         <p className="mt-4 text-center">
           Forgot your password?{" "}

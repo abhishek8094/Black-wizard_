@@ -11,13 +11,11 @@ const ExploreCollection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const { exploreData } = useSelector((state) => state.product);
-  console.log("hello", exploreData);
 
   useEffect(() => {
     dispatch(exploreCollection());
   }, [dispatch]);
 
-  // 🔹 Categories from object keys
   const categories = useMemo(() => {
     if (!exploreData || typeof exploreData !== "object") return [];
 
@@ -79,9 +77,9 @@ const ExploreCollection = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-4 gap-6">
-        {filteredProducts?.map((product) => (
+        {filteredProducts?.map((product, idx) => (
           <div
-            key={product.id}
+            key={idx}
             className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
             onMouseEnter={() => setHoveredProduct(product.id)}
             onMouseLeave={() => setHoveredProduct(null)}

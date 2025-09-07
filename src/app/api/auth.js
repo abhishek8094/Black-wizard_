@@ -17,9 +17,12 @@ export const doLogin = (data) => {
   if (data?.data === undefined) return false;
   const userData = data.data;
   const emailId = userData?.Email;
- 
-
   return true;
+};
+
+export const doLogout = () => {
+ localStorage?.clear();
+  Cookies?.remove("token");
 };
 
 export const getToken = () => {
@@ -74,11 +77,11 @@ export const postRequestWithToken = async (endpoint, data) => {
   }
 };
 
-export const postRequestWithTokenAndWithoutData = async (endpoint) => {
+export const getRequestWithTokenAndWithoutData = async (endpoint) => {
   try {
     const token = getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const response = await axios.post(`${BASE_URL}${endpoint}`, {
+    const response = await axios.get(`${BASE_URL}${endpoint}`, {
       headers,
     });
 

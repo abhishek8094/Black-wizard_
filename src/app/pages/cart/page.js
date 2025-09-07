@@ -13,18 +13,17 @@ import {
   removeFromCart,
   updateQuantity,
 } from "../../redux/slices/cartSlice";
+import { getToken } from "@/app/api/auth";
 
 export default function CartPage() {
   const items = useSelector(selectCartItems);
   const totalPrice = useSelector(selectTotalPrice);
   const dispatch = useDispatch();
   const router = useRouter();
+  const token = getToken();
 
-  const currentUser = useSelector((state) => state.auth.userData);
-
-  const handleCheckout = async () => {
-    const isLoggedIn = currentUser !== null;
-    if (isLoggedIn) {
+  const handleCheckout = async () => { 
+    if (token) {
       const response = await fetch("/api/razorpay", {
         method: "POST",
         headers: {
@@ -37,7 +36,7 @@ export default function CartPage() {
       });
 
       const data = await response.json();
-      console.log("data", data);
+     // console.log("data", data);
       if (data.success) {
         initiateRazorpayCheckout(data);
       } else {

@@ -6,6 +6,7 @@ import productReducer from "./slices/productSlice";
 import cartReducer from "./slices/cartSlice";
 import wishlistReducer from "./slices/wishlistSlice";
 import announcementReducer from "./slices/announcementSlice";
+import usersReducer from "./slices/usersSlice";
 
 const persistConfig = {
   key: "root",
@@ -26,6 +27,7 @@ export const store = configureStore({
     cart: persistedCartReducer,
     wishlist: persistedWishlistReducer,
     announcement: persistedAnnouncementReducer,
+    users: usersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

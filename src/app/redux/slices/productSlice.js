@@ -1,5 +1,5 @@
 const { createAsyncThunk, createSlice } = require("@reduxjs/toolkit");
-import { getRequest } from "@/app/api/auth";
+import { getRequest, postRequestWithToken } from "@/app/api/auth";
 
 const API_ENDPOINTS = {
   PRODUCTS: "/products",
@@ -8,6 +8,42 @@ const API_ENDPOINTS = {
   CAROUSEL: "/carousel",
   TRENDING_PRODUCT: "/trending",
 };
+
+export const addProduct = createAsyncThunk(
+  "product/addProduct",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.PRODUCTS, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add product");
+    }
+  }
+);
+
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update product");
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "product/deleteProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`, {}, { method: 'DELETE' });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete product");
+    }
+  }
+);
 
 export const getProducts = createAsyncThunk(
   "product/getProducts",
@@ -69,6 +105,42 @@ export const getCrousel = createAsyncThunk(
   }
 );
 
+export const addCarouselItem = createAsyncThunk(
+  "product/addCarouselItem",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.CAROUSEL, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add carousel item");
+    }
+  }
+);
+
+export const updateCarouselItem = createAsyncThunk(
+  "product/updateCarouselItem",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update carousel item");
+    }
+  }
+);
+
+export const deleteCarouselItem = createAsyncThunk(
+  "product/deleteCarouselItem",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/${id}`, {}, { method: 'DELETE' });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete carousel item");
+    }
+  }
+);
+
 export const exploreCollection = createAsyncThunk(
   "product/exploreCollection",
   async (_, { rejectWithValue }) => {
@@ -84,6 +156,42 @@ export const exploreCollection = createAsyncThunk(
   }
 );
 
+export const addExploreCategory = createAsyncThunk(
+  "product/addExploreCategory",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.EXPLORE_COLLECTION, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add explore category");
+    }
+  }
+);
+
+export const updateExploreCategory = createAsyncThunk(
+  "product/updateExploreCategory",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update explore category");
+    }
+  }
+);
+
+export const deleteExploreCategory = createAsyncThunk(
+  "product/deleteExploreCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/${id}`, {}, { method: 'DELETE' });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete explore category");
+    }
+  }
+);
+
 export const trendingProduct = createAsyncThunk(
   "product/trendingProduct",
   async (_, { rejectWithValue }) => {
@@ -95,6 +203,42 @@ export const trendingProduct = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch community data"
       );
+    }
+  }
+);
+
+export const addTrendingProduct = createAsyncThunk(
+  "product/addTrendingProduct",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.TRENDING_PRODUCT, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add trending product");
+    }
+  }
+);
+
+export const updateTrendingProduct = createAsyncThunk(
+  "product/updateTrendingProduct",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT}/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update trending product");
+    }
+  }
+);
+
+export const deleteTrendingProduct = createAsyncThunk(
+  "product/deleteTrendingProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT}/${id}`, {}, { method: 'DELETE' });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete trending product");
     }
   }
 );
@@ -178,6 +322,126 @@ const productSlice = createSlice({
         state.productData = action.payload;
       })
       .addCase(getProductById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addCarouselItem.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addCarouselItem.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addCarouselItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateCarouselItem.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateCarouselItem.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateCarouselItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteCarouselItem.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteCarouselItem.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteCarouselItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addExploreCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addExploreCategory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addExploreCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateExploreCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateExploreCategory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateExploreCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteExploreCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteExploreCategory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteExploreCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addTrendingProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addTrendingProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addTrendingProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateTrendingProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateTrendingProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateTrendingProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteTrendingProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteTrendingProduct.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteTrendingProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

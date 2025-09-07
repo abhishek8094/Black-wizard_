@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { editProfile } from '../redux/slices/authSlice';
 
-
-const EditProfileModal = ({ isOpen, onClose, email }) => {
+const EditProfileModal = ({ isOpen, onClose, email, name }) => {
+  const dispatch = useDispatch();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+
+  // Split name into first and last
+  useEffect(() => {
+    if (name) {
+      const parts = name.trim().split(" ");
+      setFirstName(parts[0] || "");
+      setLastName(parts.slice(1).join(" ") || "");
+    }
+  }, [name, isOpen]); 
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically update the user profile in Firebase
-    // For demonstration, we'll just show a success message
-    toast.success('Profile updated successfully!');
-    onClose();
+    try {
+      await dispatch(editProfile({ firstName, lastName })).unwrap();
+      toast.success('Profile updated successfully!');
+      onClose();
+    } catch (error) {
+      toast.error('Failed to update profile.');
+    }
   };
 
   return (
@@ -31,20 +45,16 @@ const EditProfileModal = ({ isOpen, onClose, email }) => {
             type="button"
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             onClick={onClose}
-            aria-label="Close"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" className="w-4 h-4" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" d="M2.5 2.5 7 7m4.5 4.5L7 7m0 0 4.5-4.5M7 7l-4.5 4.5"></path>
-            </svg>
+            ✕
           </button>
         </div>
 
-        {/* Form Content */}
+        {/* Form */}
         <div className="p-6">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Name Fields - Grid Layout */}
+            {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* First Name */}
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
                   First name
@@ -55,11 +65,9 @@ const EditProfileModal = ({ isOpen, onClose, email }) => {
                   placeholder="First name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-
-              {/* Last Name */}
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
                   Last name
@@ -70,43 +78,40 @@ const EditProfileModal = ({ isOpen, onClose, email }) => {
                   placeholder="Last name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
-            {/* Email Field */}
+            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
-                />
-                <span className="absolute -bottom-6 left-0 text-sm text-gray-500">
-                  Email used for login can't be changed
-                </span>
-              </div>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Email used for login can't be changed
+              </p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:justify-end sm:space-x-4 space-y-3 sm:space-y-0">
+            {/* Actions */}
+            <div className="flex justify-end space-x-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 Save
               </button>

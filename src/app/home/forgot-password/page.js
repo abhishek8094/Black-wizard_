@@ -30,7 +30,6 @@ export default function ForgotPasswordPage() {
       if (result.success === true) {
         localStorage.setItem("resetToken", result.resetToken);
         route.push("/home/reset-password")
-        toast.success("Password reset email sent! Check your inbox.");
       }
 
       resetForm();

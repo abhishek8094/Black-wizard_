@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { resetPassword } from "@/app/redux/slices/authSlice";
@@ -13,7 +13,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  // ✅ Yup validation schema
+  // validation 
   const validationSchema = Yup.object().shape({
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
@@ -23,10 +23,7 @@ export default function ResetPasswordPage() {
       .required("Confirm Password is required"),
   });
 
-  // ✅ Handle password reset with Redux
   const handleSubmit = async (values) => {
-  
-
     setLoading(true);
     try {
       const result = await dispatch(

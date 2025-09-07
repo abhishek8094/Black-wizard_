@@ -1,13 +1,11 @@
 export const initiateRazorpayCheckout = (data) => {
-
-  console.log(data)
   const options = {
-    key: data.key, // Razorpay key
-    amount: data.order.amount, // Amount is in currency subunits
+    key: data.key, 
+    amount: data.order.amount, 
     currency: data.order.currency,
-    name: "Your Company Name",
+    name: "Black-Wizard",
     description: "Purchase Description",
-    order_id: data.order.id, // This is the order_id created in the backend
+    order_id: data.order.id, 
     handler: function (response) {
       // Handle successful payment here
       // You can also send the response to your server for verification

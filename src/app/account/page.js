@@ -11,11 +11,11 @@ export default function AccountPage() {
   const userData = useSelector((state) => state.auth.userData);
   const loading = useSelector((state) => state.auth.loading);
 
-  useEffect(() => {
-    if (!userData && !loading) {
-      router.push("/home/login");
-    }
-  }, [userData, loading, router]);
+  // useEffect(() => {
+  //   if (!userData && !loading) {
+  //     router.push("/home/login");
+  //   }
+  // }, [userData, loading, router]);
 
   const handleSignOut = async () => {
     await dispatch(logout());
@@ -26,9 +26,9 @@ export default function AccountPage() {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
-  if (!userData) {
-    return null; // Will redirect to login
-  }
+  // if (!userData) {
+  //   return null; // Will redirect to login
+  // }
 
   return (
     <div className="max-w-4xl mx-auto mt-20 p-6 text-gray-800 bg-white">
@@ -37,7 +37,7 @@ export default function AccountPage() {
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
         
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>
             <p className="mt-1 text-lg">{userData.name}</p>
@@ -63,7 +63,7 @@ export default function AccountPage() {
               </p>
             </div>
           )}
-        </div>
+        </div> */}
         
         <div className="mt-6 pt-6 border-t">
           <h3 className="text-lg font-semibold mb-3">Account Actions</h3>

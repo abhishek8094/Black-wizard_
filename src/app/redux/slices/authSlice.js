@@ -1,6 +1,10 @@
 const { createAsyncThunk, createSlice } = require("@reduxjs/toolkit");
-import { postRequestWithToken, postRequestWithTokenAndWithoutData } from "@/app/api/auth";
+import {
+  postRequestWithToken,
+  getRequestWithTokenAndWithoutData,
+} from "@/app/api/auth";
 import { setToken } from "@/app/api/auth";
+import { toast } from "react-toastify";
 
 const API_ENDPOINTS = {
   APP_LOGIN: "/auth/login",
@@ -8,7 +12,21 @@ const API_ENDPOINTS = {
   FORGOT_PASSWORD: "/auth/forgotpassword",
   RESET_PASSWORD: "/auth/resetpassword",
   LOG_OUT: "/auth/logout",
+  ME: "/auth/me",
 };
+
+export const editProfile = createAsyncThunk(
+  "auth/editMeProfile",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.ME, data);
+      return response;
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 
 export const userRegistration = createAsyncThunk(
   "auth/userRegistration",
@@ -20,7 +38,7 @@ export const userRegistration = createAsyncThunk(
       );
       return response;
     } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
+      toast.error(error.response.data.message);
       return rejectWithValue(errorMessage);
     }
   }
@@ -34,8 +52,6 @@ export const appLogin = createAsyncThunk(
         API_ENDPOINTS.APP_LOGIN,
         data
       );
-
-      console.log(response);
 
       const token = response.token || response.data?.token;
 
@@ -62,7 +78,11 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.FORGOT_PASSWORD}?${localStorage.getItem("resetToken")}`,data
+      const response = await postRequestWithToken(
+        `${API_ENDPOINTS.FORGOT_PASSWORD}?${localStorage.getItem(
+          "resetToken"
+        )}`,
+        data
       );
       return response;
     } catch (error) {
@@ -79,7 +99,7 @@ export const resetPassword = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await postRequestWithToken(
-        API_ENDPOINTS.RESET_PASSWORD,
+        `${API_ENDPOINTS.RESET_PASSWORD}/${localStorage.getItem("resetToken")}`,
         data
       );
       return response;
@@ -92,12 +112,12 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-export const logout= createAsyncThunk(
+export const logout = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithTokenAndWithoutData(
-        API_ENDPOINTS.LOG_OUT,
+      const response = await getRequestWithTokenAndWithoutData(
+        API_ENDPOINTS.LOG_OUT
       );
       return response;
     } catch (error) {
@@ -107,12 +127,12 @@ export const logout= createAsyncThunk(
   }
 );
 
-
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     authData: null,
     userData: null,
+    editData: null,
     status: null,
     loading: false,
     error: null,
@@ -152,7 +172,12 @@ const authSlice = createSlice({
       .addCase(appLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.authData = action.payload;
+        state.userData = action.payload;
         state.error = null;
+        if (typeof window !== "undefined" && action.payload?.user) {
+          const { email, name } = action.payload.user;
+          localStorage.setItem("userProfile", JSON.stringify({ email, name }));
+        }
       })
 
       .addCase(appLogin.rejected, (state, action) => {
@@ -191,10 +216,29 @@ const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state, action) => {
         state.loading = false;
-        state.authData = action.payload;
+        state.authData = null;
+        state.userData = null;
         state.error = null;
       })
       .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(editProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.editData = action.payload;
+        state.userData = action.payload;
+        if (typeof window !== "undefined" && action.payload?.user) {
+          const { email, name } = action.payload.user;
+          localStorage.setItem("userProfile", JSON.stringify({ email, name }));
+        }
+      })
+      .addCase(editProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
