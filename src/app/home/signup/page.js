@@ -8,17 +8,21 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 
 export default function SignupPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  // validation 
+  // validation
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .min(2, "Name must be at least 2 characters")
-      .required("Full Name is required"),
+    firstName: Yup.string()
+      .min(2, "First Name must be at least 2 characters")
+      .required("First Name is required"),
+    lastName: Yup.string()
+      .min(2, "Last Name must be at least 2 characters")
+      .required("Last Name is required"),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
@@ -35,9 +39,11 @@ export default function SignupPage() {
     try {
       const result = await dispatch(
         userRegistration({
-          name: values.name,
+          firstName: values.firstName,
+          lastName: values.lastName,
           email: values.email,
           password: values.password,
+          role: "user",
         })
       ).unwrap();
 
@@ -61,7 +67,8 @@ export default function SignupPage() {
 
         <Formik
           initialValues={{
-            name: "",
+            firstName: "",
+            lastName: "",
             email: "",
             password: "",
             confirmPassword: "",
@@ -74,12 +81,26 @@ export default function SignupPage() {
               <div>
                 <Field
                   type="text"
-                  name="name"
-                  placeholder="Full Name"
+                  name="firstName"
+                  placeholder="First Name"
                   className="w-full p-2 border rounded"
                 />
                 <ErrorMessage
-                  name="name"
+                  name="firstName"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <Field
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  className="w-full p-2 border rounded"
+                />
+                <ErrorMessage
+                  name="lastName"
                   component="div"
                   className="text-red-500 text-sm"
                 />
@@ -140,9 +161,9 @@ export default function SignupPage() {
 
         <p className="mt-4 text-center">
           Already have an account?{" "}
-          <a href="/home/login" className="text-blue-600 underline">
+          <Link href="/home/login" className="text-blue-600 underline">
             Login here
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -42,9 +42,8 @@ const ExploreCollection = () => {
     return exploreData[categoryName] || [];
   }, [exploreData, activeCategory, categories]);
 
-  const handleProductClick = (product) => {
-    const slug = generateProductSlug(product.name);
-    router.push(`/collections/products/${slug}`);
+  const handleProductClick = (id) => {
+    router.push(`/collections/products/${id}`);
   };
 
   return (
@@ -83,7 +82,7 @@ const ExploreCollection = () => {
             className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
             onMouseEnter={() => setHoveredProduct(product.id)}
             onMouseLeave={() => setHoveredProduct(null)}
-            onClick={() => handleProductClick(product)}
+            onClick={() => handleProductClick(product.id)}
           >
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden">

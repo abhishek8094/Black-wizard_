@@ -17,9 +17,8 @@ export default function TrendingProducts() {
     dispatch(trendingProduct());
   }, [dispatch]);
 
-  const handleProductClick = (product) => {
-    const slug = generateProductSlug(product.title);
-    router.push(`/collections/products/${slug}`);
+  const handleProductClick = (id) => {
+    router.push(`/collections/products/${id}`);
   };
   return (
     <section className="pt-40 pb-20 bg-gray-50">
@@ -39,12 +38,10 @@ export default function TrendingProducts() {
               key={idx}
               className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
-          
-
               {/* Product Images */}
               <div
                 className="relative w-full aspect-[3/4] overflow-hidden cursor-pointer"
-                onClick={() => handleProductClick(product)}
+                onClick={() => handleProductClick(product.id)}
               >
                 <img
                   src={product.image}

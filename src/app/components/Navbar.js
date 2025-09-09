@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaUser, FaHeart } from "react-icons/fa6";
-import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { FaSearch, FaShoppingCart, FaUserCircle, FaTimes } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { doLogout } from "../api/auth";
@@ -24,6 +24,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isOpenProfile, setIsOpenProfile] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
   const pathname = usePathname();
   const dispatch = useDispatch();
@@ -36,7 +37,6 @@ export default function Navbar() {
 
   const handleLogOut = async () => {
     const result = await dispatch(logout()).unwrap();
-    // console.log("result",result);
     if (result.success === true) {
       toast.success(result.message);
       doLogout();
@@ -50,6 +50,14 @@ export default function Navbar() {
   const prevCartItemsRef = useRef(totalCartItems);
   const userMenuRef = useRef(null);
 
+  // Search states
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchBoxRef = useRef(null);
+  const debounceTimeout = useRef(null);
+
   useEffect(() => {
     if (prevCartItemsRef.current !== totalCartItems) {
       setAnimateBadge(true);
@@ -59,17 +67,70 @@ export default function Navbar() {
     }
   }, [totalCartItems]);
 
+  // Search API call function
+  const searchProducts = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3001/api/products/search?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      setSearchResults(data.products || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    // Debounce the API call
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(() => {
+      searchProducts(query);
+    }, 300);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setIsUserMenuOpen(false);
         setIsOpenProfile(false);
       }
+      if (searchBoxRef.current && !searchBoxRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        setSearchResults([]);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const profile = localStorage.getItem("userProfile");
+      if (profile) {
+        try {
+          const parsed = JSON.parse(profile);
+          setUserEmail(parsed.email || null);
+        } catch (e) {
+          setUserEmail(null);
+        }
+      } else {
+        setUserEmail(null);
+      }
+    }
   }, []);
 
   const handleClick = () => {
@@ -79,11 +140,6 @@ export default function Navbar() {
   const currentUser = useSelector((state) => state.auth.userData);
 
   const navigation = [
-    {
-      name: "Search",
-      href: "/products",
-      icon: <FaSearch aria-label="Search" />,
-    },
     {
       name: "Wishlist",
       href: "/pages/wishlist",
@@ -109,7 +165,86 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex text-gray-700 space-x-6 items-center">
+             {isSearchOpen && (
+            <div
+              ref={searchBoxRef}
+              className=" fixed right-80 mt-2 w-96  rounded-md shadow-lg border border-gray-200 z-50"
+            >
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => {
+                      setIsSearchOpen(false);
+                      setSearchQuery('');
+                      setSearchResults([]);
+                    }}
+                    className="p-2 text-gray-500 hover:text-gray-700"
+                    aria-label="Close search"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+                {isLoading && (
+                  <div className="mt-2 text-center text-gray-500">Searching...</div>
+                )}
+                {searchResults.length > 0 && (
+                  <div className="mt-2 max-h-60 overflow-y-auto">
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/collections/products/${product.id}`}
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          setSearchQuery('');
+                          setSearchResults([]);
+                        }}
+                        className="block px-3 py-2 hover:bg-gray-100 rounded-md"
+                      >
+                        <div className="flex items-center space-x-3">
+                          {product.image && (
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              width={40}
+                              height={40}
+                              className="rounded"
+                            />
+                          )}
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                            {product.price && (
+                              <p className="text-xs text-gray-500">${product.price}</p>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {searchQuery && !isLoading && searchResults.length === 0 && (
+                  <div className="mt-2 text-center text-gray-500">No products found</div>
+                )}
+             
+            </div>
+          )}
+
+            {/* Search Icon */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Search"
+            >
+              <FaSearch className="text-xl" />
+            </button>
+
             {[
               "/pages/orders",
               "/account/user-profile",
@@ -117,9 +252,9 @@ export default function Navbar() {
             ].includes(pathname) ? (
               <>
                 <Link
-                  href="/dashboard/shop"
+                  href="/"
                   className={`px-3 py-2 text-gray-700 hover:text-blue-600 ${
-                    pathname === "/dashboard/shop"
+                    pathname === "/"
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : ""
                   }`}
@@ -127,11 +262,11 @@ export default function Navbar() {
                   Shop
                 </Link>
                 <Link
-                  href="/dashboard/order"
+                  href="/pages/orders"
                   className={`px-3 py-2 text-gray-700 hover:text-blue-600 ${
-                    pathname === "/dashboard/order"
-                      ? ""
-                      : "text-blue-600 border-b-2 border-blue-600"
+                    pathname === "/pages/orders"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : ""
                   }`}
                 >
                   Orders
@@ -167,12 +302,12 @@ export default function Navbar() {
                   </button>
 
                   {isOpenProfile && (
-                    <div className="absolute right-0 w-64 bg-white rounded-md shadow-lg py-3 z-50 border border-gray-200">
-                      {/* Profile Icon & Email */}
-                      <div className="flex  gap-3  pb-3">
+                    <div className="absolute right-0 w-64 bg-white rounded-md shadow-lg py-3 pr-2 z-50 border border-gray-200">
+                      {/* Profile Icon & Name */}
+                      <div className="flex gap-2  pb-3 ">
                         <FaUserCircle className="w-8 h-8 ml-4 text-gray-500" />
                         <p className=" mt-1 text-sm text-gray-700 font-medium text-center break-words">
-                          {currentUser?.email || "guest@example.com"}
+                          {userEmail || "No name"}
                         </p>
                       </div>
 
@@ -180,28 +315,34 @@ export default function Navbar() {
                       <hr className="border-gray-200" />
 
                       {/* Menu Items */}
-                      <Link
-                        href="/account/user-profile"
-                        className={`px-3 py-2 block text-gray-700 hover:bg-gray-100 ${
-                          pathname === "/account/user-profile"
-                            ? ""
-                            : "text-blue-600 border-b-2 border-blue-600"
-                        }`}
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/account/settings"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Settings
-                      </Link>
-                      <button
-                        onClick={handleLogOut}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Sign out
-                      </button>
+                      <div className="pl-3">
+                        <Link
+                          href="/account/user-profile"
+                          className={`px-3 py-2 block text-gray-700 hover:bg-gray-100 ${
+                            pathname === "/account/user-profile"
+                              ? "text-blue-600 border-b-2 border-blue-600"
+                              : ""
+                          }`}
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/account/settings"
+                          className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
+                            pathname === "/account/settings"
+                              ? "text-blue-600 border-b-2 border-blue-600"
+                              : ""
+                          }`}
+                        >
+                          Settings
+                        </Link>
+                        <button
+                          onClick={handleLogOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Sign out
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -241,7 +382,7 @@ export default function Navbar() {
                     onMouseLeave={() => setIsUserMenuOpen(false)}
                   >
                     <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
-                      <div className="text-xl">
+                      <div className="text-xl flex items-center">
                         <FaUser aria-label="Profile" />
                       </div>
                     </button>
@@ -287,6 +428,8 @@ export default function Navbar() {
             )}
           </div>
 
+       
+         
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button

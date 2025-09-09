@@ -8,6 +8,7 @@ import {
   FaYoutube,
   FaThreads,
 } from "react-icons/fa6";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -22,31 +23,31 @@ const Footer = () => {
           />
 
           <div className="flex flex-wrap gap-4 mb-4">
-            <a href="https://www.facebook.com/shopcoitonic/" target="_blank" rel="noopener noreferrer">
+            <Link href="https://www.facebook.com/shopcoitonic/" target="_blank" rel="noopener noreferrer">
               <FaFacebookF />
-            </a>
-            <a href="https://twitter.com/shopcoitonic">
+            </Link>
+            <Link href="https://twitter.com/shopcoitonic">
               <FaTwitter />
-            </a>
-            <a href="https://www.instagram.com/blackwizardsports?igsh=OHpzbnBudTR5ODB4">
+            </Link>
+            <Link href="https://www.instagram.com/blackwizardsports?igsh=OHpzbnBudTR5ODB4">
               <FaInstagram />
-            </a>
-            <a href="https://www.pinterest.com/shopcoitonic/">
+            </Link>
+            <Link href="https://www.pinterest.com/shopcoitonic/">
               <FaPinterestP />
-            </a>
-            <a href="https://www.youtube.com/@shopcoitonic">
+            </Link>
+            <Link href="https://www.youtube.com/@shopcoitonic">
               <FaYoutube />
-            </a>
-            <a href="https://www.threads.net/@shopcoitonic">
+            </Link>
+            <Link href="https://www.threads.net/@shopcoitonic">
               <FaThreads />
-            </a>
+            </Link>
           </div>
-          <a
+          <Link
             href="/contact-us"
             className="inline-block mt-2 px-4 py-2 border border-white text-white hover:bg-white hover:text-black transition"
           >
             Contact Us
-          </a>
+          </Link>
         </div>
 
         {/* Quick Links */}
@@ -57,7 +58,7 @@ const Footer = () => {
             <li><a href="/collections?category=Compression%20Fit">Compression Fit</a></li>
             <li><a href="/collections?category=Compression%20Fit">Man</a></li>
              <li><a href="/collections?category=Compression%20Fit">Socks</a></li>
-            <li><a href="/pages/contact">Contact Us</a></li>
+            <li><a href="/contact-us">Contact Us</a></li>
             <li><a href="/pages/faq">FAQ</a></li>
           </ul>
         </div>

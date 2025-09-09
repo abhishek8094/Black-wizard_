@@ -29,9 +29,9 @@ export const addUser = async (userData) => {
   }
 };
 
-export const editUser = async (id) => {
+export const editUser = async (id, userData) => {
   try {
-    const response = await postRequestWithToken(API_ENDPOINTS.USER_BY_ID(id),);
+    const response = await postRequestWithToken(API_ENDPOINTS.USER_BY_ID(id), userData);
     return response;
   } catch (error) {
     console.error("Edit user failed:", error);
@@ -42,7 +42,7 @@ export const editUser = async (id) => {
 export const deleteUser = async (id) => {
   try {
     // Assuming DELETE is handled via POST or GET, adjust if backend has DELETE
-    const response = await getRequestWithTokenAndWithoutData(API_ENDPOINTS.USER_BY_ID(id) + "/delete");
+    const response = await postRequestWithToken(API_ENDPOINTS.USER_BY_ID(id) + "/delete");
     return response;
   } catch (error) {
     console.error("Delete user failed:", error);

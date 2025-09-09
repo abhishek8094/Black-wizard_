@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { createUser, updateUser } from "../redux/slices/usersSlice";
+import { fetchUsers } from "../redux/slices/usersSlice";
 
 const UserModal = ({ isOpen, onClose, user }) => {
-  console.log("user", user);
+
+  console.log(user)
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
     email: "",
+    password: "",
     role: "user",
   });
+  // New state to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || "",
+        firstName: user.firstName || "",
         email: user.email || "",
+        password:user.password || "",
         role: user.role || "user",
       });
+      setShowPassword(false); // reset on user change
     } else {
       setFormData({
-        name: "",
+        firstName: "",
         email: "",
+        password: "",
         role: "user",
       });
+      setShowPassword(false);
     }
   }, [user]);
 
@@ -34,12 +43,14 @@ const UserModal = ({ isOpen, onClose, user }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (user) {
-      dispatch(updateUser(user._id));
+      await dispatch(updateUser({ id: user._id, data: formData }));
+      await dispatch(fetchUsers())
     } else {
-      dispatch(createUser(formData));
+      await dispatch(createUser(formData));
+      await dispatch(fetchUsers())
     }
     onClose();
   };
@@ -48,17 +59,17 @@ const UserModal = ({ isOpen, onClose, user }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
+      <div className="bg-white p-6 rounded text-gray-700 shadow-lg w-96">
         <h2 className="text-xl font-bold mb-4">
           {user ? "Edit User" : "Add User"}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
+            <label className="block text-gray-700">First Name</label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="firstName"
+              value={formData.firstName}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded"
               required
@@ -75,6 +86,37 @@ const UserModal = ({ isOpen, onClose, user }) => {
               required
             />
           </div>
+          <div className="mb-4 relative">
+            <label className="block text-gray-700">Password</label>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded pr-10"
+              required={!user}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-8 text-gray-600"
+              tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10a9.96 9.96 0 012.175-6.125M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
+
           <div className="mb-4">
             <label className="block text-gray-700">Role</label>
             <select
@@ -82,6 +124,7 @@ const UserModal = ({ isOpen, onClose, user }) => {
               value={formData.role}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded"
+              required={!user}
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>

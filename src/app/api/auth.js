@@ -66,6 +66,10 @@ export const postRequestWithToken = async (endpoint, data) => {
   try {
     const token = getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    if (data instanceof FormData) {
+      delete headers['Content-Type'];
+    }
+
     const response = await axios.post(`${BASE_URL}${endpoint}`, data, {
       headers,
     });

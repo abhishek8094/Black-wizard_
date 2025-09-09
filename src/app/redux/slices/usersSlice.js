@@ -20,9 +20,10 @@ export const createUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await addUser(userData);
-      return response;
+      return response.data;
     } catch (error) {
-      toast.error("Failed to add user");
+      if (error.status === 400) {
+        toast.error(error.response.data.message[0])};
       return rejectWithValue(error.message);
     }
   }
@@ -30,12 +31,13 @@ export const createUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "users/updateUser",
-  async ( id, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await editUser(id);
-      return response;
+      const response = await editUser(id, data);
+      return response.data;
     } catch (error) {
-      toast.error("Failed to update user");
+       if (error.status === 400) {
+        toast.error(error.response.data.message)};
       return rejectWithValue(error.message);
     }
   }
@@ -46,9 +48,11 @@ export const removeUser = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await deleteUser(id);
+
       return response;
     } catch (error) {
-      toast.error("Failed to delete user");
+      if (error.status === 400) {
+        toast.error(error.response.data.message)};
       return rejectWithValue(error.message);
     }
   }
@@ -95,7 +99,7 @@ const usersSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
         const index = state.usersList.findIndex(
-          (user) => user.id === action.payload.id
+          (user) => user._id === action.meta.arg.id
         );
         if (index !== -1) {
           state.usersList[index] = action.payload;
@@ -112,7 +116,7 @@ const usersSlice = createSlice({
       .addCase(removeUser.fulfilled, (state, action) => {
         state.loading = false;
         state.usersList = state.usersList.filter(
-          (user) => user.id !== action.meta.arg
+          (user) => user._id !== action.meta.arg
         );
       })
       .addCase(removeUser.rejected, (state, action) => {

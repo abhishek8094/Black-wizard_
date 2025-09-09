@@ -8,6 +8,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { appLogin } from "@/app/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const route = useRouter()
@@ -92,16 +93,16 @@ export default function LoginPage() {
 
         <p className="mt-4 text-center">
           Forgot your password?{" "}
-          <a href="/home/forgot-password" className="text-blue-600 underline">
+          <Link href="/home/forgot-password" className="text-blue-600 underline">
             Reset here
-          </a>
+          </Link>
         </p>
 
         <p className="mt-2 text-center">
           Don’t have an account?{" "}
-          <a href="/home/signup" className="text-blue-600 underline">
+          <Link href="/home/signup" className="text-blue-600 underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
 
