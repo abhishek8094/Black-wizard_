@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { exploreCollection, updateExploreCategory,  getProducts } from "@/app/redux/slices/productSlice";
+import ExploreCollectionModal from "@/app/components/ExploreCollectionModal";
 
 export default function AdminExploreCollection() {
   const { userData } = useSelector((state) => state.auth);
@@ -12,17 +13,30 @@ export default function AdminExploreCollection() {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const [isAdding, setIsAdding] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getUserRole = () => {
+    // First check Redux state
+    if (userData?.user?.role) {
+      return userData.user.role;
+    }
+    // Fallback to localStorage
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("userRole");
+    }
+    return null;
+  };
+
+  const userRole = getUserRole();
 
   useEffect(() => {
-    if (!userData || userData.user.role !== "admin") {
+    if (userRole !== "admin") {
       router.push("/home/login");
       return;
     }
     dispatch(exploreCollection());
     dispatch(getProducts());
-  }, [userData, dispatch, router]);
+  }, [userRole, dispatch, router]);
 
   const handleDelete = (productId) => {
     if (confirm("Are you sure you want to remove this product from the explore collection?")) {
@@ -35,21 +49,19 @@ export default function AdminExploreCollection() {
     }
   };
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
+  const handleAdd = async (selectedProductId) => {
     if (!selectedProductId) return;
     const product = productsData.find(p => p._id === selectedProductId);
     if (!product) return;
     const updatedAll = [...(exploreData["All"] || []), product];
     dispatch(updateExploreCategory({ id: "All", products: updatedAll.map(p => p.id) }));
-    setIsAdding(false);
-    setSelectedProductId("");
+    setIsModalOpen(false);
     dispatch(exploreCollection()); // Refetch
   };
 
   const exploreProducts = exploreData?.["All"] || [];
 
-  if (!userData || userData.user.role !== "admin") return null;
+  if (userRole !== "admin") return null;
 
   return (
     <div className="pt-2 pb-6 px-6 bg-gray-100 min-h-screen">
@@ -59,7 +71,7 @@ export default function AdminExploreCollection() {
           <div className="flex space-x-2">
            
             <button
-              onClick={() => setIsAdding(true)}
+              onClick={() => setIsModalOpen(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Add Product
@@ -67,42 +79,7 @@ export default function AdminExploreCollection() {
           </div>
         </div>
 
-        {isAdding && (
-          <form onSubmit={handleAdd} className="mb-6 p-4 border rounded bg-gray-50">
-            <h2 className="text-lg font-semibold mb-4">Add Product to Explore Collection</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Select Product</label>
-              <select
-                value={selectedProductId}
-                onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-              >
-                <option value="">Choose a product...</option>
-                {productsData?.filter(p => !exploreProducts.some(ep => ep.id === p._id)).map((product) => (
-                  <option key={product._id} value={product._id}>
-                    {product.name} - Rs. {product.price}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                Add
-              </button>
-              <button
-                type="button"
-                onClick={() => { setIsAdding(false); setSelectedProductId(""); }}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
+
 
         {loading ? (
           <p>Loading...</p>
@@ -141,6 +118,14 @@ export default function AdminExploreCollection() {
           </div>
         )}
       </div>
+
+      <ExploreCollectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAdd}
+        productsData={productsData}
+        exploreProducts={exploreProducts}
+      />
     </div>
   );
 }

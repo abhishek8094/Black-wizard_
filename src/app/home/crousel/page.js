@@ -37,7 +37,7 @@ export default function CarouselPage() {
             <div className="relative h-96 md:h-[500px] lg:h-[600px]">
               {data?.length > 0 && (
                 <img
-                  src={data[currentIndex]} 
+                  src={data[currentIndex]?.imageUrl}
                   alt={`Slide ${currentIndex + 1}`}
                   className="object-cover"
                 />

@@ -6,7 +6,9 @@ const API_ENDPOINTS = {
   PRODUCT_CATEGORIES: "/categories",
   EXPLORE_COLLECTION: "/explore",
   CAROUSEL: "/carousel",
+  DELETE_CAROUSEL: "/carousel/delete",
   TRENDING_PRODUCT: "/trending",
+    TRENDING_PRODUCT_DELETE: "/trending/delete"
 };
 
 export const addProduct = createAsyncThunk(
@@ -131,9 +133,9 @@ export const updateCarouselItem = createAsyncThunk(
 
 export const deleteCarouselItem = createAsyncThunk(
   "product/deleteCarouselItem",
-  async (id, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/${id}`, {}, { method: 'DELETE' });
+      const response = await postRequestWithToken(API_ENDPOINTS.DELETE_CAROUSEL, data);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete carousel item");
@@ -235,7 +237,7 @@ export const deleteTrendingProduct = createAsyncThunk(
   "product/deleteTrendingProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT}/${id}`, {}, { method: 'DELETE' });
+      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT_DELETE}/${id}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete trending product");

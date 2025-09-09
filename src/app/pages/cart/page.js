@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { initiateRazorpayCheckout } from "@/app/utils/razorpay";
 import {
@@ -14,6 +15,8 @@ import {
   updateQuantity,
 } from "../../redux/slices/cartSlice";
 import { getToken } from "@/app/api/auth";
+import { fetchAddresses } from "../../redux/slices/addressSlice";
+import { getFormattedDefaultAddress } from "@/app/utils/addressUtils";
 
 export default function CartPage() {
   const items = useSelector(selectCartItems);
@@ -46,6 +49,15 @@ export default function CartPage() {
       router.push("/home/login");
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAddresses());
+    }
+  }, [dispatch, token]);
+
+  const { addressesData } = useSelector((state) => state.address);
+  const defaultAddress = getFormattedDefaultAddress(addressesData);
 
   if (items.length === 0) {
     return (

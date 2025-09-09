@@ -3,7 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { getCrousel, addCarouselItem, updateCarouselItem, deleteCarouselItem } from "@/app/redux/slices/productSlice";
+import { toast } from "react-toastify";
+import {
+  getCrousel,
+  addCarouselItem,
+  updateCarouselItem,
+  deleteCarouselItem,
+} from "@/app/redux/slices/productSlice";
+import CarouselModal from "@/app/components/CarouselModal";
 
 export default function AdminCarousel() {
   const { userData } = useSelector((state) => state.auth);
@@ -14,21 +21,39 @@ export default function AdminCarousel() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
+
+  const getUserRole = () => {
+    // First check Redux state
+    if (userData?.user?.role) {
+      return userData.user.role;
+    }
+    // Fallback to localStorage
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("userRole");
+    }
+    return null;
+  };
+
+  const userRole = getUserRole();
 
   useEffect(() => {
-    if (!userData || userData.user.role !== "admin") {
+    if (userRole !== "admin") {
       router.push("/home/login");
-      return;
     }
     dispatch(getCrousel());
-  }, [userData, dispatch, router]);
+  }, [userRole, dispatch, router]);
 
-  if (!userData || userData.user.role !== "admin") return null;
+  // Check if user is admin
+  if (userRole !== "admin") {
+    return null;
+  }
 
   const handleAdd = () => {
     setIsEditing(true);
     setEditingId(null);
     setImageUrl("");
+    setUploadedFile(null);
   };
 
   const handleEdit = (id, url) => {
@@ -38,22 +63,45 @@ export default function AdminCarousel() {
   };
 
   const handleDelete = async (id) => {
+    console.log("id", id);
     if (confirm("Are you sure you want to delete this carousel item?")) {
-      await dispatch(deleteCarouselItem(id));
-      dispatch(getCrousel()); // Refetch after delete
+      const result = await dispatch(deleteCarouselItem({ id: id })).unwrap();
+      console.log(result, "result");
+      if (result.success === true) {
+        toast.success(result.message);
+        await dispatch(getCrousel());
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingId) {
-      await dispatch(updateCarouselItem({ id: editingId, imageUrl }));
+      if (uploadedFile) {
+        // Send FormData with file for update
+        const data = new FormData();
+        data.append('image', uploadedFile);
+        await dispatch(updateCarouselItem({ id: editingId, data }));
+      } else {
+        await dispatch(updateCarouselItem({ id: editingId, imageUrl }));
+      }
     } else {
-      await dispatch(addCarouselItem({ imageUrl }));
+      if (uploadedFile) {
+        // Send FormData with file for add
+        const data = new FormData();
+        data.append('image', uploadedFile);
+        const result = await dispatch(addCarouselItem(data)).unwrap();
+        if(result.success === true){
+          toast.success(result.message)
+        }
+      } else {
+        await dispatch(addCarouselItem({ imageUrl }));
+      }
     }
     setIsEditing(false);
     setEditingId(null);
     setImageUrl("");
+    setUploadedFile(null);
     dispatch(getCrousel()); // Refetch after add/update
   };
 
@@ -61,57 +109,32 @@ export default function AdminCarousel() {
     setIsEditing(false);
     setEditingId(null);
     setImageUrl("");
+    setUploadedFile(null);
   };
 
   return (
-    <div className="pt-4 pb-5 px-6 bg-gray-100 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-700">Manage Carousel</h1>
-          <div className="flex space-x-2">
-           
-            <button
-              onClick={handleAdd}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Add Item
-            </button>
-          </div>
+    <div className="pt-4 pb-5 px-6 bg-gray-100 text-gray-700 min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-700">Manage Carousel</h1>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleAdd}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Add Item
+          </button>
         </div>
+      </div>
       <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-      
-
-        {isEditing && (
-          <form onSubmit={handleSubmit} className="mb-6 p-4 border rounded bg-gray-50">
-            <h2 className="text-lg font-semibold mb-4">
-              {editingId ? "Edit Carousel Item" : "Add Carousel Item"}
-            </h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Image URL</label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div className="flex space-x-2">
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                {editingId ? "Update" : "Add"}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
+        <CarouselModal
+          isOpen={isEditing}
+          onClose={handleCancel}
+          imageUrl={imageUrl}
+          setImageUrl={setImageUrl}
+          onSubmit={handleSubmit}
+          isEdit={!!editingId}
+          onFileSelect={setUploadedFile}
+        />
 
         {loading ? (
           <p>Loading...</p>
@@ -126,25 +149,25 @@ export default function AdminCarousel() {
                 </tr>
               </thead>
               <tbody>
-                {carouselData?.map((url, index) => (
-                  <tr key={index} className="border-t">
+                {carouselData?.map((item, index) => (
+                  <tr key={item.id} className="border-t">
                     <td className="p-4">
                       <img
-                        src={url}
+                        src={item.imageUrl}
                         alt={`Carousel ${index + 1}`}
                         className="w-16 h-16 object-cover rounded"
                       />
                     </td>
-                    <td className="p-4">{url}</td>
+                    <td className="p-4">{item.imageUrl}</td>
                     <td className="p-4">
                       <button
-                        onClick={() => handleEdit(index, url)}
+                        onClick={() => handleEdit(item.id, item.imageUrl)}
                         className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-4 inline-block"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(index)}
+                        onClick={() => handleDelete(item.id)}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
                       >
                         Delete

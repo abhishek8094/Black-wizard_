@@ -1,30 +1,27 @@
-
-'use client';
-import React, { useState, useEffect } from 'react';
-import { FiHeart, FiShoppingCart, FiStar, FiTruck } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { initiateRazorpayCheckout } from '@/app/utils/razorpay';
-import { getProductById } from '@/app/redux/slices/productSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectCartItems,
-  addToCart,
-} from '@/app/redux/slices/cartSlice';
+"use client";
+import React, { useState, useEffect } from "react";
+import { FiHeart, FiShoppingCart, FiStar, FiTruck } from "react-icons/fi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { initiateRazorpayCheckout } from "@/app/utils/razorpay";
+import { getProductById } from "@/app/redux/slices/productSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCartItems, addToCart } from "@/app/redux/slices/cartSlice";
+import { FaRulerHorizontal } from "react-icons/fa";
 import {
   selectWishlistItems,
   addToWishlist,
   removeFromWishlist,
-} from '@/app/redux/slices/wishlistSlice';
+} from "@/app/redux/slices/wishlistSlice";
 
 export default function ProductDetailPage({ params }) {
   const dispatch = useDispatch();
   const unwrappedParams = React.use(params);
   const { productId } = unwrappedParams;
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState("");
   const { productData } = useSelector((state) => state.product);
   const cartItems = useSelector(selectCartItems);
   const wishlistItems = useSelector(selectWishlistItems);
@@ -35,8 +32,8 @@ export default function ProductDetailPage({ params }) {
 
   useEffect(() => {
     if (productData) {
-      setSelectedSize(productData.size ? productData.size[0] : '');
-      setSelectedImage(productData.images ? productData.images[0] : '');
+      setSelectedSize(productData.size ? productData.size[0] : "");
+      setSelectedImage(productData.images ? productData.images[0] : "");
     }
   }, [productData]);
 
@@ -56,8 +53,8 @@ export default function ProductDetailPage({ params }) {
   }
 
   const handleAddToCart = () => {
-    const existingItem = cartItems.find(item =>
-      item.id === productData.id && item.size === selectedSize
+    const existingItem = cartItems.find(
+      (item) => item.id === productData.id && item.size === selectedSize
     );
 
     if (existingItem) {
@@ -101,7 +98,6 @@ export default function ProductDetailPage({ params }) {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -123,7 +119,9 @@ export default function ProductDetailPage({ params }) {
                   key={index}
                   onClick={() => setSelectedImage(image)}
                   className={`aspect-w-1 aspect-h-1 overflow-hidden rounded-md ${
-                    selectedImage === image ? 'ring-2 ring-blue-600' : 'ring-1 ring-gray-200'
+                    selectedImage === image
+                      ? "ring-2 ring-blue-600"
+                      : "ring-1 ring-gray-200"
                   }`}
                 >
                   <img
@@ -142,48 +140,56 @@ export default function ProductDetailPage({ params }) {
           <div className="space-y-6">
             {/* Title and Rating */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{productData.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {productData.name}
+              </h1>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <FiStar
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(productData.rating || 4) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(productData.rating || 4)
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
+                      }`}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">({productData.reviews || 0} reviews)</span>
+                <span className="text-sm text-gray-600">
+                  ({productData.reviews || 0} reviews)
+                </span>
               </div>
             </div>
 
             {/* Price */}
             <div className="flex items-center space-x-3">
-              <span className="text-3xl font-bold text-gray-900">₹{productData.price}</span>
-              {productData.originalPrice > productData.price && (
-                <>
-                  <span className="text-xl text-gray-500 line-through">₹{productData.originalPrice}</span>
-                  <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">
-                    {Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}% OFF
-                  </span>
-                </>
-              )}
+              <span className="text-3xl font-bold text-gray-900">
+                ₹{productData.price}
+              </span>
             </div>
 
             {/* Description */}
-            <p className="text-gray-600">{productData.description}</p>
+            {/* <p className="text-gray-600">{productData.description}</p> */}
 
             {/* Size Selection */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-2">Size</h3>
+              <div className="flex items-center space-x-2">
+                <FaRulerHorizontal size={20} />
+                <span className="font-medium">Size Guide</span>
+              </div>
+              <p className="text-sm mt-5 font-medium text-gray-900 mb-2">
+                SIZE :
+              </p>
               <div className="flex flex-wrap gap-2">
-                {productData?.size?.map(size => (
+                {productData?.size?.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${
                       selectedSize === size
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-400"
                     }`}
                   >
                     {size}
@@ -225,7 +231,11 @@ export default function ProductDetailPage({ params }) {
                 onClick={handleWishlistToggle}
                 className="p-3 border border-gray-300 rounded-md hover:bg-gray-50"
               >
-                <FiHeart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+                <FiHeart
+                  className={`w-5 h-5 ${
+                    isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
+                  }`}
+                />
               </button>
             </div>
 
@@ -239,7 +249,9 @@ export default function ProductDetailPage({ params }) {
 
             {/* Product Features */}
             <div className="border-t pt-6">
-              <h3 className="text-lg font-medium mb-4">Product Features</h3>
+              <h3 className="text-lg font-medium mb-4 text-gray-600">
+                Product Features
+              </h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
                   <FiTruck className="w-4 h-4 mr-2 text-green-600" />

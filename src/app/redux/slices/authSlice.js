@@ -175,8 +175,9 @@ const authSlice = createSlice({
         state.userData = action.payload;
         state.error = null;
         if (typeof window !== "undefined" && action.payload?.user) {
-          const { email, name } = action.payload.user;
-          localStorage.setItem("userProfile", JSON.stringify({ email, name }));
+          const { email, firstName, lastName, role } = action.payload.user;
+          localStorage.setItem("userProfile", JSON.stringify({ email, firstName, lastName, role }));
+          localStorage.setItem("userRole", role);
         }
       })
 
@@ -219,6 +220,10 @@ const authSlice = createSlice({
         state.authData = null;
         state.userData = null;
         state.error = null;
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("userProfile");
+          localStorage.removeItem("userRole");
+        }
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
@@ -234,8 +239,9 @@ const authSlice = createSlice({
         state.editData = action.payload;
         state.userData = action.payload;
         if (typeof window !== "undefined" && action.payload?.user) {
-          const { email, name } = action.payload.user;
-          localStorage.setItem("userProfile", JSON.stringify({ email, name }));
+          const { email, firstName, lastName, role } = action.payload.user;
+          localStorage.setItem("userProfile", JSON.stringify({ email, firstName, lastName, role }));
+          localStorage.setItem("userRole", role);
         }
       })
       .addCase(editProfile.rejected, (state, action) => {

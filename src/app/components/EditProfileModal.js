@@ -8,14 +8,20 @@ const EditProfileModal = ({ isOpen, onClose, email, name }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  // Split name into first and last
   useEffect(() => {
-    if (name) {
-      const parts = name.trim().split(" ");
-      setFirstName(parts[0] || "");
-      setLastName(parts.slice(1).join(" ") || "");
+    if (isOpen) {
+      const userProfile = localStorage.getItem('userProfile');
+      if (userProfile) {
+        const profile = JSON.parse(userProfile);
+        setFirstName(profile.firstName || "");
+        setLastName(profile.lastName || "");
+      } else if (name) {
+        const parts = name.trim().split(" ");
+        setFirstName(parts[0] || "");
+        setLastName(parts.slice(1).join(" ") || "");
+      }
     }
-  }, [name, isOpen]); 
+  }, [name, isOpen]);
 
   if (!isOpen) return null;
 
@@ -23,6 +29,15 @@ const EditProfileModal = ({ isOpen, onClose, email, name }) => {
     e.preventDefault();
     try {
       await dispatch(editProfile({ firstName, lastName })).unwrap();
+      // Update userProfile in localStorage with new firstName and lastName
+      const existingProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+      const updatedProfile = {
+        ...existingProfile,
+        firstName,
+        lastName,
+        email: email || existingProfile.email
+      };
+      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
       toast.success('Profile updated successfully!');
       onClose();
     } catch (error) {
@@ -31,7 +46,7 @@ const EditProfileModal = ({ isOpen, onClose, email, name }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-gray-600 bg-black bg-opacity-50">
       <div 
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         role="dialog"
