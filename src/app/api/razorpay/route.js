@@ -5,7 +5,6 @@ import Razorpay from 'razorpay';
 // Validate environment variables
 function validateRazorpayConfig() {
   const keyId = process.env.RAZORPAY_KEY_ID;
-  console.log("keyid", keyId)
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {

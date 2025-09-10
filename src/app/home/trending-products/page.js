@@ -11,7 +11,6 @@ export default function TrendingProducts() {
   const dispatch = useDispatch();
   const router = useRouter();
   const {trendingProductData} = useSelector((state)=>state.product);
-  //console.log("data",trendingProductData);
 
   useEffect(() => {
     dispatch(trendingProduct());

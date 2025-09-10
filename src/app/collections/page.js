@@ -28,7 +28,6 @@ const CollectionsContent = () => {
   const productsPerPage = 8;
 
   const { productsData } = useSelector((state) => state.product);
-  console.log("prody", productsData);
   const [products, setProducts] = useState(productsData);
   const [filteredProducts, setFilteredProducts] = useState(products);
 
@@ -87,7 +86,7 @@ const CollectionsContent = () => {
   const uniqueCategories = [...new Set(productsData?.map(product => product.category))];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" bg-gray-50">
       {/* Header Banner */}
       <header className="py-6 md:py-8 lg:pt-12 lg:pb-8 relative">
         <div className="container mx-auto px-4 text-center">

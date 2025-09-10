@@ -63,10 +63,8 @@ export default function AdminCarousel() {
   };
 
   const handleDelete = async (id) => {
-    console.log("id", id);
     if (confirm("Are you sure you want to delete this carousel item?")) {
       const result = await dispatch(deleteCarouselItem({ id: id })).unwrap();
-      console.log(result, "result");
       if (result.success === true) {
         toast.success(result.message);
         await dispatch(getCrousel());

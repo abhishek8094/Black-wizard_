@@ -11,12 +11,6 @@ export default function AccountPage() {
   const userData = useSelector((state) => state.auth.userData);
   const loading = useSelector((state) => state.auth.loading);
 
-  // useEffect(() => {
-  //   if (!userData && !loading) {
-  //     router.push("/home/login");
-  //   }
-  // }, [userData, loading, router]);
-
   const handleSignOut = async () => {
     await dispatch(logout());
     router.push("/");
@@ -26,9 +20,6 @@ export default function AccountPage() {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
-  // if (!userData) {
-  //   return null; // Will redirect to login
-  // }
 
   return (
     <div className="max-w-4xl mx-auto mt-20 p-6 text-gray-800 bg-white">
@@ -69,13 +60,13 @@ export default function AccountPage() {
           <h3 className="text-lg font-semibold mb-3">Account Actions</h3>
           <div className="space-y-2">
             <button
-              onClick={() => router.push("/orders")}
+              onClick={() => router.push("/pages/orders")}
               className="w-full text-left p-3 bg-gray-100 rounded hover:bg-gray-200"
             >
               My Orders
             </button>
             <button
-              onClick={() => router.push("/wishlist")}
+              onClick={() => router.push("/pages/wishlist")}
               className="w-full text-left p-3 bg-gray-100 rounded hover:bg-gray-200"
             >
               My Wishlist

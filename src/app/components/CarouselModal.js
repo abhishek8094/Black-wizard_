@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 
 const CarouselModal = ({ isOpen, onClose, imageUrl, setImageUrl, onSubmit, isEdit, onFileSelect }) => {
-
-  console.log(imageUrl,isEdit )
   const [uploadedFile, setUploadedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const fileInputRef = useRef(null);
@@ -14,7 +12,6 @@ const CarouselModal = ({ isOpen, onClose, imageUrl, setImageUrl, onSubmit, isEdi
     if (file) {
       setUploadedFile(file);
       const url = URL.createObjectURL(file);
-      console.log(url)
       setPreviewUrl(url);
       setImageUrl(url); 
       if (onFileSelect) {
