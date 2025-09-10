@@ -5,7 +5,6 @@ import { fetchUsers } from "../redux/slices/usersSlice";
 
 const UserModal = ({ isOpen, onClose, user }) => {
 
-  console.log(user)
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     firstName: "",

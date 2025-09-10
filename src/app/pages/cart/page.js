@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { initiateRazorpayCheckout } from "@/app/utils/razorpay";
 import {
@@ -16,34 +16,71 @@ import {
 } from "../../redux/slices/cartSlice";
 import { getToken } from "@/app/api/auth";
 import { fetchAddresses } from "../../redux/slices/addressSlice";
-import { getFormattedDefaultAddress } from "@/app/utils/addressUtils";
+import { addOrder } from "../../redux/slices/orderSlice";
 
 export default function CartPage() {
   const items = useSelector(selectCartItems);
   const totalPrice = useSelector(selectTotalPrice);
+  const {addressesData} = useSelector((state) => state.address);
   const dispatch = useDispatch();
   const router = useRouter();
   const token = getToken();
+  const [paymentMethod, setPaymentMethod] = useState("credit_card");
 
-  const handleCheckout = async () => { 
+  const handleCheckout = async () => {
     if (token) {
-      const response = await fetch("/api/razorpay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          product: items,
-          amount: totalPrice,
-        }),
-      });
+      // Prepare order data using the provided JSON structure
+      const products = items.map(item => ({
+        product: item._id,
+        quantity: item.quantity
+      }));
 
-      const data = await response.json();
-     // console.log("data", data);
-      if (data.success) {
-        initiateRazorpayCheckout(data);
-      } else {
-        console.error("Error creating Razorpay order:", data.error);
+      const defaultAddress = addressesData.data[0]._id
+      const shippingAddress = defaultAddress;
+      const orderData = {
+        products,
+        shippingAddress,
+        paymentMethod
+      };
+
+      // Dispatch addOrder to create the order
+      try {
+        const resultAction = await dispatch(addOrder(orderData));
+        if (addOrder.fulfilled.match(resultAction)) {
+          // Order created successfully, proceed to payment
+          const orderId = resultAction.payload.id; // Assuming the response has order ID
+
+          // Store cart items in localStorage before checkout
+          localStorage.setItem("checkoutItems", JSON.stringify(items));
+          const subtotal = totalPrice;
+          const shipping = 0; // Free shipping
+          const total = subtotal + shipping;
+          const orderSummary = { subtotal, shipping, total };
+          localStorage.setItem("orderSummary", JSON.stringify(orderSummary));
+
+          const response = await fetch("/api/razorpay", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              product: items,
+              amount: total,
+              orderId, 
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            initiateRazorpayCheckout(data);
+          } else {
+            console.error("Error creating Razorpay order:", data.error);
+          }
+        } else {
+          console.error("Failed to create order:", resultAction.payload);
+        }
+      } catch (error) {
+        console.error("Error during checkout:", error);
       }
     } else {
       router.push("/home/login");
@@ -56,17 +93,16 @@ export default function CartPage() {
     }
   }, [dispatch, token]);
 
-  const { addressesData } = useSelector((state) => state.address);
-  const defaultAddress = getFormattedDefaultAddress(addressesData);
-
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="p-28 bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Your Cart is Empty
           </h1>
-          <p className="text-gray-600 mb-8">Add some products to get started!</p>
+          <p className="text-gray-600 mb-8">
+            Add some products to get started!
+          </p>
           <Link
             href="/"
             className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
@@ -79,9 +115,11 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold  text-gray-900 mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold  text-gray-900 mb-8">
+          Shopping Cart
+        </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
@@ -105,7 +143,9 @@ export default function CartPage() {
                   <div className="flex-1 ml-4">
                     <h3 className="font-semibold text-gray-900">{item.name}</h3>
                     <p className="text-sm text-gray-600">Size: {item.size}</p>
-                    <p className="text-lg font-bold text-gray-900">₹{item.price}</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      ₹{item.price}
+                    </p>
                   </div>
 
                   <div className="flex items-center space-x-2 text-gray-600">
@@ -142,7 +182,9 @@ export default function CartPage() {
 
                   <button
                     onClick={() => {
-                      dispatch(removeFromCart({ id: item.id, size: item.size }));
+                      dispatch(
+                        removeFromCart({ id: item.id, size: item.size })
+                      );
                       toast.success("Item removed from the cart");
                     }}
                     className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded"

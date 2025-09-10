@@ -5,7 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaUser, FaHeart } from "react-icons/fa6";
-import { FaSearch, FaShoppingCart, FaUserCircle, FaTimes } from "react-icons/fa";
+import { searchProduct } from "../redux/slices/productSlice";
+import {
+  FaSearch,
+  FaShoppingCart,
+  FaUserCircle,
+  FaTimes,
+} from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { doLogout } from "../api/auth";
@@ -52,7 +58,7 @@ export default function Navbar() {
 
   // Search states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const searchBoxRef = useRef(null);
@@ -75,11 +81,10 @@ export default function Navbar() {
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/products/search?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      setSearchResults(data.products || []);
+      const result = await dispatch(searchProduct(query)).unwrap()
+      setSearchResults(result.data || []);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       setSearchResults([]);
     } finally {
       setIsLoading(false);
@@ -105,9 +110,12 @@ export default function Navbar() {
         setIsUserMenuOpen(false);
         setIsOpenProfile(false);
       }
-      if (searchBoxRef.current && !searchBoxRef.current.contains(event.target)) {
+      if (
+        searchBoxRef.current &&
+        !searchBoxRef.current.contains(event.target)
+      ) {
         setIsSearchOpen(false);
-        setSearchQuery('');
+        setSearchQuery("");
         setSearchResults([]);
       }
     };
@@ -137,7 +145,6 @@ export default function Navbar() {
     setIsOpenProfile((prev) => !prev);
   };
 
-  const currentUser = useSelector((state) => state.auth.userData);
 
   const navigation = [
     {
@@ -166,75 +173,76 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex text-gray-700 space-x-6 items-center">
-             {isSearchOpen && (
-            <div
-              ref={searchBoxRef}
-              className=" fixed right-80 mt-2 w-96  rounded-md shadow-lg border border-gray-200 z-50"
-            >
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchQuery('');
-                      setSearchResults([]);
-                    }}
-                    className="p-2 text-gray-500 hover:text-gray-700"
-                    aria-label="Close search"
-                  >
-                    <FaTimes />
-                  </button>
+            {isSearchOpen && (
+              <div
+                ref={searchBoxRef}
+                className="fixed right-80 top-12 w-96 rounded-md  z-50"
+              >
+                {/* Search input */}
+                <div className="flex items-center space-x-2 p-2">
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full px-3 py-2 pr-8 border  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoFocus
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSearchResults([]);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        aria-label="Clear search"
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+                  </div>
                 </div>
-                {isLoading && (
-                  <div className="mt-2 text-center text-gray-500">Searching...</div>
-                )}
-                {searchResults.length > 0 && (
-                  <div className="mt-2 max-h-60 overflow-y-auto">
-                    {searchResults.map((product) => (
+
+                {/* Search results */}
+                <div className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {isLoading && (
+                    <div className="p-3 text-center text-gray-500">
+                      Searching...
+                    </div>
+                  )}
+
+                  {searchResults.length > 0 &&
+                    searchResults.map((product,index) => (
                       <Link
-                        key={product.id}
-                        href={`/collections/products/${product.id}`}
+                        key={index}
+                        href={`/collections/products/${product._id}`}
                         onClick={() => {
                           setIsSearchOpen(false);
-                          setSearchQuery('');
+                          setSearchQuery("");
                           setSearchResults([]);
                         }}
                         className="block px-3 py-2 hover:bg-gray-100 rounded-md"
                       >
                         <div className="flex items-center space-x-3">
-                          {product.image && (
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              width={40}
-                              height={40}
-                              className="rounded"
-                            />
-                          )}
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{product.name}</p>
-                            {product.price && (
-                              <p className="text-xs text-gray-500">${product.price}</p>
-                            )}
+                            <p className="text-sm font-medium text-gray-900">
+                              {product.name}
+                            </p>
                           </div>
                         </div>
                       </Link>
                     ))}
-                  </div>
-                )}
-                {searchQuery && !isLoading && searchResults.length === 0 && (
-                  <div className="mt-2 text-center text-gray-500">No products found</div>
-                )}
-             
-            </div>
-          )}
+
+                  {searchQuery && !isLoading && searchResults.length === 0 && (
+                    <div className="p-3 text-center text-gray-500">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Search Icon */}
             <button
@@ -428,8 +436,6 @@ export default function Navbar() {
             )}
           </div>
 
-       
-         
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button

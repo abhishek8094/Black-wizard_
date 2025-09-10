@@ -34,7 +34,7 @@ export default function CarouselPage() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="relative w-full max-w-6xl mx-auto">
           <div className="relative overflow-hidden rounded-lg shadow-2xl">
-            <div className="relative h-96 md:h-[500px] lg:h-[600px]">
+            <div className="relative  md:h-[500px] lg:h-[600px]">
               {data?.length > 0 && (
                 <img
                   src={data[currentIndex]?.imageUrl}

@@ -1,14 +1,15 @@
 const { createAsyncThunk, createSlice } = require("@reduxjs/toolkit");
-import { getRequest, postRequestWithToken } from "@/app/api/auth";
+import { getRequest, getRequestWithToken, postRequestWithToken } from "@/app/api/auth";
 
 const API_ENDPOINTS = {
   PRODUCTS: "/products",
+  PRODUCTS_SEARCH: "/products/search",
   PRODUCT_CATEGORIES: "/categories",
   EXPLORE_COLLECTION: "/explore",
   CAROUSEL: "/carousel",
   DELETE_CAROUSEL: "/carousel/delete",
   TRENDING_PRODUCT: "/trending",
-    TRENDING_PRODUCT_DELETE: "/trending/delete"
+  TRENDING_PRODUCT_DELETE: "/trending/delete"
 };
 
 export const addProduct = createAsyncThunk(
@@ -16,6 +17,18 @@ export const addProduct = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await postRequestWithToken(API_ENDPOINTS.PRODUCTS, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add product");
+    }
+  }
+);
+
+export const searchProduct = createAsyncThunk(
+  "product/searchProduct",
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await getRequest(`${API_ENDPOINTS.PRODUCTS_SEARCH}?q=${query}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to add product");
@@ -256,6 +269,7 @@ const productSlice = createSlice({
     productData: null,
     loading: false,
     error: null,
+    searchProduct:null
   },
   reducers: {},
 
@@ -446,7 +460,20 @@ const productSlice = createSlice({
       .addCase(deleteTrendingProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(searchProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.searchProduct = action.payload
+      })
+      .addCase(searchProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+
+      
   },
 });
 

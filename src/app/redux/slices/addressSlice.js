@@ -38,7 +38,7 @@ export const updateAddress = createAsyncThunk(
   "address/updateAddress",
   async ({ id, addressData }, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINT}/${id}`, addressData);
+      const response = await postRequestWithToken(`${API_ENDPOINT}/${id}/update`, addressData);
       toast.success("Address updated successfully");
       return response;
     } catch (error) {

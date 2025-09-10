@@ -174,7 +174,7 @@ export default function ProductDetailPage({ params }) {
 
             {/* Size Selection */}
             <div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center text-gray-600 space-x-2">
                 <FaRulerHorizontal size={20} />
                 <span className="font-medium">Size Guide</span>
               </div>

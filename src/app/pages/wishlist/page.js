@@ -35,7 +35,7 @@ export default function WishlistPage() {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className=" bg-gray-50 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <FaHeart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -58,7 +58,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-3">
+    <div className=" bg-gray-50 pt-5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           My Wishlist ({wishlistItems.length} items)
