@@ -173,77 +173,6 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex text-gray-700 space-x-6 items-center">
-            {isSearchOpen && (
-              <div
-                ref={searchBoxRef}
-                className="fixed right-80 top-12 w-96 rounded-md  z-50"
-              >
-                {/* Search input */}
-                <div className="flex items-center space-x-2 p-2">
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      className="w-full px-3 py-2 pr-8 border  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      autoFocus
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery("");
-                          setSearchResults([]);
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        aria-label="Clear search"
-                      >
-                        <FaTimes />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Search results */}
-                <div className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {isLoading && (
-                    <div className="p-3 text-center text-gray-500">
-                      Searching...
-                    </div>
-                  )}
-
-                  {searchResults.length > 0 &&
-                    searchResults.map((product,index) => (
-                      <Link
-                        key={index}
-                        href={`/collections/products/${product._id}`}
-                        onClick={() => {
-                          setIsSearchOpen(false);
-                          setSearchQuery("");
-                          setSearchResults([]);
-                        }}
-                        className="block px-3 py-2 hover:bg-gray-100 rounded-md"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {product.name}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-
-                  {searchQuery && !isLoading && searchResults.length === 0 && (
-                    <div className="p-3 text-center text-gray-500">
-                      No products found
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Search Icon */}
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -436,72 +365,244 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none"
-              aria-label="Toggle menu"
+          {/* Desktop Search Box */}
+          {isSearchOpen && (
+            <div
+              ref={searchBoxRef}
+              className="fixed top-12 left-4 right-4 md:left-auto md:right-80 md:w-96 w-full rounded-md z-50 hidden md:block "
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
+              {/* Search input */}
+              <div className="flex items-center space-x-2 p-2">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
                   />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      aria-label="Clear search"
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Search results */}
+              <div className="absolute left-0 w-full mt-1 bg-white  rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {isLoading && (
+                  <div className="p-3 text-center text-gray-500">
+                    Searching...
+                  </div>
                 )}
-              </svg>
+
+                {searchResults.length > 0 &&
+                  searchResults.map((product, index) => (
+                    <Link
+                      key={index}
+                      href={`/collections/products/${product._id}`}
+                      onClick={() => {
+                        setIsSearchOpen(false);
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }}
+                      className="block px-3 py-2 hover:bg-gray-100 rounded-md"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {product.name}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+
+                {searchQuery && !isLoading && searchResults.length === 0 && (
+                  <div className="p-3 text-center text-gray-500">
+                    No products found
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Search Icon */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Search"
+            >
+              <FaSearch className="text-xl" />
             </button>
+            {isSearchOpen && (
+              <div
+                ref={searchBoxRef}
+                className="fixed top-28 left-4 right-4 rounded-md z-50 md:hidden w-auto "
+              >
+                {/* Search input */}
+                <div className="flex items-center space-x-2 p-2">
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className="w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoFocus
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSearchResults([]);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        aria-label="Clear search"
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Search results */}
+                <div className="absolute left-0 w-full mt-1 bg-white  rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {isLoading && (
+                    <div className="p-3 text-center text-gray-500">
+                      Searching...
+                    </div>
+                  )}
+
+                  {searchResults.length > 0 &&
+                    searchResults.map((product, index) => (
+                      <Link
+                        key={index}
+                        href={`/collections/products/${product._id}`}
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          setSearchQuery("");
+                          setSearchResults([]);
+                        }}
+                        className="block px-3 py-2 hover:bg-gray-100 rounded-md"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {product.name}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+
+                  {searchQuery && !isLoading && searchResults.length === 0 && (
+                    <div className="p-3 text-center text-gray-500">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Wishlist Icon */}
+            <Link
+              href="/pages/wishlist"
+              className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Wishlist"
+            >
+              <FaHeart className="text-xl" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Cart Icon */}
+            <Link
+              href="/pages/cart"
+              className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Cart"
+            >
+              <FaShoppingCart className="text-xl" />
+              {totalCartItems > 0 && (
+                <span className={`absolute -top-1 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full ${animateBadge ? "animate-ping" : ""}`}>
+                  {totalCartItems}
+                </span>
+              )}
+            </Link>
+
+            {/* User/Profile Icon */}
+            {getToken() ? (
+              <div
+                className="relative"
+                ref={userMenuRef}
+                onMouseEnter={() => setIsUserMenuOpen(true)}
+                onMouseLeave={() => setIsUserMenuOpen(false)}
+              >
+                <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                  <div className="text-xl flex items-center">
+                    <FaUser aria-label="Profile" />
+                  </div>
+                </button>
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <Link
+                      href="/pages/orders"
+                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        pathname === "/pages/orders"
+                          ? "text-blue-600 border-b-2 border-blue-600"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      Dashboard
+                    </Link>
+
+                    <Link
+                      href="/account/user-profile"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Addresses
+                    </Link>
+                    <button
+                      onClick={handleLogOut}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/home/login"
+                className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                <div className="text-xl">
+                  <FaUser aria-label="Login" />
+                </div>
+              </Link>
+            )}
+
+
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white shadow-md rounded-md">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`relative flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors ${
-                    pathname === item.href ? "bg-blue-50 text-blue-600" : ""
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                  aria-label={item.name}
-                >
-                  <div className="text-xl">{item.icon}</div>
-                  {item.badge > 0 && (
-                    <span className="absolute -top-1 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
-              {getToken() && (
-                <button
-                  onClick={handleLogOut}
-                  className="w-full text-left px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Log Out
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+
       </div>
     </nav>
   );
