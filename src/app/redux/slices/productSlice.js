@@ -1,5 +1,5 @@
 const { createAsyncThunk, createSlice } = require("@reduxjs/toolkit");
-import { getRequest, getRequestWithToken, postRequestWithToken } from "@/app/api/auth";
+import { getRequest, postRequestWithToken } from "@/app/api/auth";
 
 const API_ENDPOINTS = {
   PRODUCTS: "/products",
@@ -99,8 +99,44 @@ export const productCategories = createAsyncThunk(
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch community data"
+        error.response?.data?.message || "Failed to fetch categories"
       );
+    }
+  }
+);
+
+export const addCategory = createAsyncThunk(
+  "product/addCategory",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(API_ENDPOINTS.PRODUCT_CATEGORIES, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to add category");
+    }
+  }
+);
+
+export const updateCategory = createAsyncThunk(
+  "product/updateCategory",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCT_CATEGORIES}/${id}/update`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to update category");
+    }
+  }
+);
+
+export const deleteCategory = createAsyncThunk(
+  "product/deleteCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCT_CATEGORIES}/${id}/delete`);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete category");
     }
   }
 );
@@ -294,6 +330,51 @@ const productSlice = createSlice({
         state.productCategorieData = action.payload;
       })
       .addCase(productCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(addCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally refresh categories after adding
+        if (state.productCategorieData) {
+          state.productCategorieData = [...state.productCategorieData, action.payload];
+        }
+      })
+      .addCase(addCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally update the category in the list
+        if (state.productCategorieData) {
+          const index = state.productCategorieData.findIndex(cat => cat.id === action.payload.id);
+          if (index !== -1) {
+            state.productCategorieData[index] = action.payload;
+          }
+        }
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        // Optionally remove the category from the list
+        if (state.productCategorieData) {
+          state.productCategorieData = state.productCategorieData.filter(cat => cat.id !== action.meta.arg);
+        }
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -23,22 +23,22 @@ const Footer = () => {
           />
 
           <div className="flex flex-wrap gap-4 mb-4">
-            <Link href="https://www.facebook.com/shopcoitonic/" target="_blank" rel="noopener noreferrer">
+            <Link href="#" target="_blank" rel="noopener noreferrer">
               <FaFacebookF />
             </Link>
-            <Link href="https://twitter.com/shopcoitonic">
+            <Link href="#">
               <FaTwitter />
             </Link>
             <Link href="https://www.instagram.com/blackwizardsports?igsh=OHpzbnBudTR5ODB4">
               <FaInstagram />
             </Link>
-            <Link href="https://www.pinterest.com/shopcoitonic/">
+            <Link href="#">
               <FaPinterestP />
             </Link>
-            <Link href="https://www.youtube.com/@shopcoitonic">
+            <Link href="#">
               <FaYoutube />
             </Link>
-            <Link href="https://www.threads.net/@shopcoitonic">
+            <Link href="#">
               <FaThreads />
             </Link>
           </div>
@@ -54,12 +54,12 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="/">Home</a></li>
-            <li><a href="/collections?category=Compression%20Fit">Compression Fit</a></li>
-            <li><a href="/collections?category=Compression%20Fit">Man</a></li>
-             <li><a href="/collections?category=Compression%20Fit">Socks</a></li>
-            <li><a href="/contact-us">Contact Us</a></li>
-            <li><a href="/pages/faq">FAQ</a></li>
+            <li><Link href="/">Home</Link></li>
+            <li><Link href="/collections?category=Compression%20Fit">Compression Fit</Link></li>
+            <li><Link href="/collections?category=Compression%20Fit">Man</Link></li>
+             <li><Link href="/collections?category=Compression%20Fit">Socks</Link></li>
+            <li><Link href="/contact-us">Contact Us</Link></li>
+            <li><Link href="#">FAQ</Link></li>
           </ul>
         </div>
 
@@ -67,10 +67,10 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-4">My Account</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="/home/login">Login</a></li>
-            <li><a href="/home/signup">SignUp</a></li>
-            <li><a href="/pages/tracking-order">Track Your Order</a></li>
-            <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+            <li><Link href="/home/login">Login</Link></li>
+            <li><Link href="/home/signup">SignUp</Link></li>
+            <li><Link href="/pages/tracking-order">Track Your Order</Link></li>
+            <li><Link href="#">Privacy Policy</Link></li>
           </ul>
         </div>
 
@@ -78,10 +78,10 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="https://www.facebook.com/shopcoitonic/">Facebook</a></li>
-            <li><a href="https://twitter.com/shopcoitonic">Twitter</a></li>
-            <li><a href="https://www.instagram.com/blackwizardsports?igsh=OHpzbnBudTR5ODB4">Instagram</a></li>
-            <li><a href="https://www.snapchat.com/add/shopcoitonic">Snapchat</a></li>
+            <li><Link href="#">Facebook</Link></li>
+            <li><Link href="#">Twitter</Link></li>
+            <li><Link href="https://www.instagram.com/blackwizardsports?igsh=OHpzbnBudTR5ODB4">Instagram</Link></li>
+            <li><Link href="#">Snapchat</Link></li>
           </ul>
         </div>
       </div>

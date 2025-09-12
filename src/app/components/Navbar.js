@@ -450,7 +450,7 @@ export default function Navbar() {
             {isSearchOpen && (
               <div
                 ref={searchBoxRef}
-                className="fixed top-28 left-4 right-4 rounded-md z-50 md:hidden w-auto "
+                className="fixed top-24 left-4 right-4 rounded-md z-50 md:hidden w-auto "
               >
                 {/* Search input */}
                 <div className="flex items-center space-x-2 p-2">
