@@ -10,7 +10,6 @@ import {
   deleteCategory,
 } from "@/app/redux/slices/productSlice";
 import CategoryModal from "./CategoryModal";
-import { babelIncludeRegexes } from "next/dist/build/webpack-config";
 
 export default function AdminCategories() {
   const { userData } = useSelector((state) => state.auth);
