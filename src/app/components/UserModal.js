@@ -50,6 +50,14 @@ const UserModal = ({ isOpen, onClose, user }) => {
     } else {
       await dispatch(createUser(formData));
       await dispatch(fetchUsers())
+  
+      setFormData({
+        firstName: "",
+        email: "",
+        password: "",
+        role: "user",
+      });
+      setShowPassword(false);
     }
     onClose();
   };

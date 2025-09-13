@@ -41,6 +41,19 @@ const AddressModal = ({ isOpen, onClose, address }) => {
         phone: address.phone || "",
         defaultAddress: address.defaultAddress || false,
       });
+    } else {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        country: "India",
+        address: "",
+        apartmentSuite: "",
+        city: "",
+        state: "",
+        pinCode: "",
+        phone: "",
+        defaultAddress: false,
+      });
     }
   }, [address]);
 

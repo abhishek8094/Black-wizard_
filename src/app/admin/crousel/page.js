@@ -22,6 +22,7 @@ export default function AdminCarousel() {
   const [editingId, setEditingId] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [modalKey, setModalKey] = useState(0);
 
   const getUserRole = () => {
     // First check Redux state
@@ -54,12 +55,14 @@ export default function AdminCarousel() {
     setEditingId(null);
     setImageUrl("");
     setUploadedFile(null);
+    setModalKey((prev) => prev + 1); // Reset modal state by changing key
   };
 
   const handleEdit = (id, url) => {
     setIsEditing(true);
     setEditingId(id);
     setImageUrl(url);
+    setModalKey((prev) => prev + 1); // Reset modal state by changing key
   };
 
   const handleDelete = async (id) => {
@@ -74,33 +77,47 @@ export default function AdminCarousel() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      if (uploadedFile) {
-        // Send FormData with file for update
-        const data = new FormData();
-        data.append('image', uploadedFile);
-        await dispatch(updateCarouselItem({ id: editingId, data }));
-      } else {
-        await dispatch(updateCarouselItem({ id: editingId, imageUrl }));
-      }
-    } else {
-      if (uploadedFile) {
-        // Send FormData with file for add
-        const data = new FormData();
-        data.append('image', uploadedFile);
-        const result = await dispatch(addCarouselItem(data)).unwrap();
-        if(result.success === true){
-          toast.success(result.message)
+    try {
+      if (editingId) {
+        if (uploadedFile) {
+          // Send FormData with file for update
+          const data = new FormData();
+          data.append('image', uploadedFile);
+          const result = await dispatch(updateCarouselItem({ id: editingId, data })).unwrap();
+          if (result.success === true) {
+            toast.success(result.message);
+          }
+        } else {
+          const result = await dispatch(updateCarouselItem({ id: editingId, imageUrl })).unwrap();
+          if (result.success === true) {
+            toast.success(result.message);
+          }
         }
       } else {
-        await dispatch(addCarouselItem({ imageUrl }));
+        if (uploadedFile) {
+          // Send FormData with file for add
+          const data = new FormData();
+          data.append('image', uploadedFile);
+          const result = await dispatch(addCarouselItem(data)).unwrap();
+          if (result.success === true) {
+            toast.success(result.message);
+          }
+        } else {
+          const result = await dispatch(addCarouselItem({ imageUrl })).unwrap();
+          if (result.success === true) {
+            toast.success(result.message);
+          }
+        }
       }
+      // Close modal after add or update
+      setIsEditing(false);
+      setEditingId(null);
+      setImageUrl("");
+      setUploadedFile(null);
+      dispatch(getCrousel());
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
     }
-    setIsEditing(false);
-    setEditingId(null);
-    setImageUrl("");
-    setUploadedFile(null);
-    dispatch(getCrousel()); // Refetch after add/update
   };
 
   const handleCancel = () => {
@@ -108,6 +125,7 @@ export default function AdminCarousel() {
     setEditingId(null);
     setImageUrl("");
     setUploadedFile(null);
+    setModalKey((prev) => prev + 1); // Reset modal state by changing key
   };
 
   return (
@@ -125,6 +143,7 @@ export default function AdminCarousel() {
       </div>
       <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
         <CarouselModal
+          key={modalKey}
           isOpen={isEditing}
           onClose={handleCancel}
           imageUrl={imageUrl}

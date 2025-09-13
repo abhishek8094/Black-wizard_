@@ -8,6 +8,7 @@ import { trendingProduct, addTrendingProduct, updateTrendingProduct, deleteTrend
 import { toast } from "react-toastify";
 import TrendingModal from "@/app/components/TrendingModal";
 
+
 export default function AdminTrending() {
   const { userData } = useSelector((state) => state.auth);
   const { trendingProductData, productsData, loading } = useSelector((state) => state.product);
@@ -17,8 +18,7 @@ export default function AdminTrending() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedProductId, setSelectedProductId] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
+
 
   const getUserRole = () => {
     // First check Redux state
@@ -68,15 +68,18 @@ export default function AdminTrending() {
   const handleModalSubmit = async (formData, productId) => {
     try {
       if (isEditMode && productId) {
-        await dispatch(updateTrendingProduct({ id: productId, ...Object.fromEntries(formData) })).unwrap();
+        formData.append('id', productId);
+        await dispatch(updateTrendingProduct(formData)).unwrap();
         toast.success("Trending product updated successfully");
       } else {
-        await dispatch(addTrendingProduct(Object.fromEntries(formData))).unwrap();
-        toast.success("Trending product added successfully");
+
+        await dispatch(addTrendingProduct(formData)).unwrap();
+        toast.success("Product added and set as trending successfully");
       }
       setIsModalOpen(false);
       setSelectedProduct(null);
       dispatch(trendingProduct()); // Refetch
+      dispatch(getProducts()); // Refetch products
     } catch (error) {
       toast.error(error.message || "An error occurred");
     }
@@ -115,6 +118,7 @@ export default function AdminTrending() {
                     <tr>
                       <th className="p-4 text-left">Name</th>
                       <th className="p-4 text-left">Price</th>
+                      <th className="p-4 text-left">Size</th>
                       <th className="p-4 text-left">Actions</th>
                     </tr>
                   </thead>
@@ -123,6 +127,7 @@ export default function AdminTrending() {
                       <tr key={idx} className="border-t">
                         <td className="p-4">{product.title || product.name}</td>
                         <td className="p-4">Rs. {product.price}</td>
+                        <td className="p-4">{product.size || 'N/A'}</td>
                         <td className="p-4">
                           <button
                             onClick={() => handleOpenEditModal(product)}
