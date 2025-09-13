@@ -1,7 +1,7 @@
 "use client";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { FiTrash2, FiPlus, FiMinus } from "react-icons/fi";
+import { FiTrash2, FiPlus, FiMinus, FiShoppingCart } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -97,6 +97,7 @@ export default function CartPage() {
     return (
       <div className="p-28 bg-gray-50 flex items-center justify-center">
         <div className="text-center">
+          <FiShoppingCart className="mx-auto mb-4 w-16 h-16 text-gray-400" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4 whitespace-nowrap">
             Your Cart is Empty
           </h1>

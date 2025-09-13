@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { generateProductSlug } from "@/app/utils/slugify";
 import { useDispatch, useSelector } from "react-redux";
-import { exploreCollection } from "@/app/redux/slices/productSlice";
+import { exploreCollection } from "@/app/redux/slices/exploreCollectionSlice";
 
 const ExploreCollection = () => {
   const dispatch = useDispatch();

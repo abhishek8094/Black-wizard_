@@ -379,7 +379,7 @@ export default function Navbar() {
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    className="w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 pr-8 border text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     autoFocus
                   />
                   {searchQuery && (
@@ -460,7 +460,7 @@ export default function Navbar() {
                       placeholder="Search products..."
                       value={searchQuery}
                       onChange={handleSearchChange}
-                      className="w-full px-3 py-2 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 pr-8 border text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       autoFocus
                     />
                     {searchQuery && (

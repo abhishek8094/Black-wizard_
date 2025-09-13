@@ -4,22 +4,20 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import {
-  productCategories,
-  addCategory,
-  updateCategory,
-  deleteCategory,
-} from "@/app/redux/slices/productSlice";
-import CategoryModal from "./CategoryModal";
+  fetchAddresses,
+  updateAddress,
+  deleteAddress,
+} from "@/app/redux/slices/addressSlice";
+import AddressModal from "@/app/components/AddressModal";
 
-export default function AdminCategories() {
+export default function AdminAddresses() {
   const { userData } = useSelector((state) => state.auth);
   const {
-    productCategorieData,
+    addressesData,
     loading,
     error,
-  } = useSelector((state) => state.product);
+  } = useSelector((state) => state.address);
 
-  //console.log(productCategorieData)
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -43,7 +41,7 @@ export default function AdminCategories() {
 
   useEffect(() => {
     if (userRole === "admin") {
-      dispatch(productCategories());
+      dispatch(fetchAddresses());
     }
   }, [userRole, dispatch]);
 
@@ -53,57 +51,27 @@ export default function AdminCategories() {
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingAddress, setEditingAddress] = useState(null);
 
   const openAddModal = () => {
-    setEditingCategory(null);
+    setEditingAddress(null);
     setIsModalOpen(true);
   };
 
-  const openEditModal = (category) => {
-    setEditingCategory(category);
+  const openEditModal = (address) => {
+    setEditingAddress(address);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setEditingCategory(null);
-    
-  };
-
-  const handleSubmit = async (category) => {
-    const formData = new FormData();
-    formData.append("title", category.title);
-
-    if (category.id) {
-      // For update, only append image if a new file is uploaded
-      if (category.image && category.image instanceof File) {
-        formData.append("image", category.image);
-      }
-      // If no new image, don't append, let backend keep existing image
-      await dispatch(updateCategory({ id: category.id, data: formData })).then(() => {
-        closeModal();
-        dispatch(productCategories());
-      });
-    } else {
-      // For add, append image if provided
-      if (category.image) {
-        formData.append("image", category.image);
-      }
-      const result = await dispatch(addCategory(formData)).unwrap();
-      if(result.success === true){
-        closeModal()
-        await dispatch(productCategories());
-      }
-
-
-    }
+    setEditingAddress(null);
   };
 
   const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this category?")) {
-      dispatch(deleteCategory(id)).then(() => {
-        dispatch(productCategories());
+    if (confirm("Are you sure you want to delete this address?")) {
+      dispatch(deleteAddress(id)).then(() => {
+        dispatch(fetchAddresses());
       });
     }
   };
@@ -111,60 +79,74 @@ export default function AdminCategories() {
   return (
     <div className="pt-4 pb-5 px-6 bg-gray-100 text-gray-700 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-700">Manage Categories</h1>
+        <h1 className="text-2xl font-bold text-gray-700">Manage Addresses</h1>
         <div className="flex space-x-2">
           <button
             onClick={openAddModal}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Add Category
+            Add Address
           </button>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <CategoryModal
+      <div className="max-w-6xl mx-auto bg-white p-6 rounded shadow">
+        <AddressModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          onSubmit={handleSubmit}
-          initialData={editingCategory}
+          address={editingAddress}
         />
 
         {loading ? (
-          <p>Loading categories...</p>
+          <p>Loading addresses...</p>
         ) : error ? (
           <p className="text-red-600">Error: {error}</p>
-        ) : !productCategorieData || productCategorieData.length === 0 ? (
-          <p className="text-center py-8 text-gray-500">No categories found. Add your first category!</p>
+        ) : !addressesData || !addressesData.data || addressesData.data.length === 0 ? (
+          <p className="text-center py-8 text-gray-500">No addresses found.</p>
         ) : (
           <div className="bg-white text-gray-700 rounded shadow overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-4 text-left">Category Name</th>
-                  <th className="p-4 text-left">Image</th>
+                  <th className="p-4 text-left">Name</th>
+                  <th className="p-4 text-left">Address</th>
+                  <th className="p-4 text-left">City</th>
+                  <th className="p-4 text-left">State</th>
+                  <th className="p-4 text-left">PIN</th>
+                  <th className="p-4 text-left">Phone</th>
+                  <th className="p-4 text-left">Default</th>
                   <th className="p-4 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {productCategorieData.map((category,idx) => (
+                {addressesData.data.map((address, idx) => (
                   <tr key={idx} className="border-t hover:bg-gray-50">
                     <td className="p-4">
                       <div className="flex items-center">
-                        <span className="font-medium text-gray-900">{category.title}</span>
+                        <span className="font-medium text-gray-900">
+                          {address.firstName} {address.lastName}
+                        </span>
                       </div>
                     </td>
                     <td className="p-4 text-gray-600">
-                      <img src={category.image} className="w-16 h-16"/>
+                      {address.address}
+                      {address.apartmentSuite && `, ${address.apartmentSuite}`}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-gray-600">{address.city}</td>
+                    <td className="p-4 text-gray-600">{address.state}</td>
+                    <td className="p-4 text-gray-600">{address.pinCode}</td>
+                    <td className="p-4 text-gray-600">{address.phone}</td>
+                    <td className="p-4 text-gray-600">
+                      {address.defaultAddress ? "Yes" : "No"}
+                    </td>
+                    <td className="p-4 whitespace-nowrap">
                       <button
-                        onClick={() => openEditModal(category)}
+                        onClick={() => openEditModal(address)}
                         className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-2 inline-block"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(category.id)}
+                        onClick={() => handleDelete(address._id)}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
                       >
                         Delete

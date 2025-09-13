@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { getUsers } from "@/app/api/users";
-import { getProducts, exploreCollection, trendingProduct } from "@/app/redux/slices/productSlice";
+import { getProducts, trendingProduct } from "@/app/redux/slices/productSlice";
+import { exploreCollection } from "../redux/slices/exploreCollectionSlice";
 
 export default function AdminDashboard() {
   const { userData } = useSelector((state) => state.auth);

@@ -172,8 +172,8 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
                 required
               >
                 <option value="">Select Category</option>
-                {productCategorieData?.map(cat => (
-                  <option key={cat._id} value={cat._id}>{cat.name}</option>
+                {productCategorieData?.map((cat , idx )=> (
+                  <option key={idx} value={cat._id}>{cat.name}</option>
                 ))}
               </select>
             </div>

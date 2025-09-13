@@ -23,13 +23,17 @@ export default function CategoryModal({ isOpen, onClose, onSubmit, initialData }
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (title.trim() === "") {
       alert("Category title is required");
       return;
     }
-    onSubmit({ title: title ,image:image });
+    await onSubmit({ title: title ,image:image });
+    // Reset form
+    setTitle("");
+    setImage(null);
+    setImagePreview("");
   };
 
   return (

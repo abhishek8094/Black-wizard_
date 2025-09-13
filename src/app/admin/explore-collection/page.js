@@ -4,12 +4,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { exploreCollection, updateExploreCategory,  getProducts } from "@/app/redux/slices/productSlice";
+import { exploreCollection, addExploreCollection, deleteExploreCollection } from "@/app/redux/slices/exploreCollectionSlice";
+import { getProducts } from "@/app/redux/slices/productSlice";
 import ExploreCollectionModal from "@/app/components/ExploreCollectionModal";
 
 export default function AdminExploreCollection() {
   const { userData } = useSelector((state) => state.auth);
-  const { exploreData, productsData, loading } = useSelector((state) => state.product);
+  const { exploreData, loading } = useSelector((state) => state.exploreCollection);
+  const { productsData } = useSelector((state) => state.product);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -40,12 +42,9 @@ export default function AdminExploreCollection() {
 
   const handleDelete = (productId) => {
     if (confirm("Are you sure you want to remove this product from the explore collection?")) {
-      // For simplicity, we'll remove from "All" category
-      const updatedAll = exploreData["All"].filter(p => p.id !== productId);
-      const updatedData = { ...exploreData, "All": updatedAll };
-      // Since we don't have a direct update thunk, we'll use updateExploreCategory with "All"
-      dispatch(updateExploreCategory({ id: "All", products: updatedAll.map(p => p.id) }));
-      dispatch(exploreCollection()); // Refetch
+      dispatch(deleteExploreCollection(productId)).then(() => {
+        dispatch(exploreCollection());
+      });
     }
   };
 
@@ -53,10 +52,10 @@ export default function AdminExploreCollection() {
     if (!selectedProductId) return;
     const product = productsData.find(p => p._id === selectedProductId);
     if (!product) return;
-    const updatedAll = [...(exploreData["All"] || []), product];
-    dispatch(updateExploreCategory({ id: "All", products: updatedAll.map(p => p.id) }));
-    setIsModalOpen(false);
-    dispatch(exploreCollection()); // Refetch
+    dispatch(addExploreCollection(product)).then(() => {
+      setIsModalOpen(false);
+      dispatch(exploreCollection());
+    });
   };
 
   const exploreProducts = exploreData?.["All"] || [];

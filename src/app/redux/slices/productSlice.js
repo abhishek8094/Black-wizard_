@@ -5,7 +5,6 @@ const API_ENDPOINTS = {
   PRODUCTS: "/products",
   PRODUCTS_SEARCH: "/products/search",
   PRODUCT_CATEGORIES: "/categories",
-  EXPLORE_COLLECTION: "/explore",
   CAROUSEL: "/carousel",
   DELETE_CAROUSEL: "/carousel/delete",
   TRENDING_PRODUCT: "/trending",
@@ -52,7 +51,7 @@ export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`, {}, { method: 'DELETE' });
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete product");
@@ -172,7 +171,7 @@ export const updateCarouselItem = createAsyncThunk(
   "product/updateCarouselItem",
   async ({ id, ...data }, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/${id}`, data);
+      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/update`, data);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update carousel item");
@@ -188,57 +187,6 @@ export const deleteCarouselItem = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete carousel item");
-    }
-  }
-);
-
-export const exploreCollection = createAsyncThunk(
-  "product/exploreCollection",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getRequest(API_ENDPOINTS.EXPLORE_COLLECTION);
-      return response.data;
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch community data"
-      );
-    }
-  }
-);
-
-export const addExploreCategory = createAsyncThunk(
-  "product/addExploreCategory",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await postRequestWithToken(API_ENDPOINTS.EXPLORE_COLLECTION, data);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to add explore category");
-    }
-  }
-);
-
-export const updateExploreCategory = createAsyncThunk(
-  "product/updateExploreCategory",
-  async ({ id, ...data }, { rejectWithValue }) => {
-    try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/${id}`, data);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update explore category");
-    }
-  }
-);
-
-export const deleteExploreCategory = createAsyncThunk(
-  "product/deleteExploreCategory",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/${id}`, {}, { method: 'DELETE' });
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to delete explore category");
     }
   }
 );
@@ -272,9 +220,11 @@ export const addTrendingProduct = createAsyncThunk(
 
 export const updateTrendingProduct = createAsyncThunk(
   "product/updateTrendingProduct",
-  async ({ id, ...data }, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT}/${id}`, data);
+      const id = formData.get('id');
+      formData.delete('id');
+      const response = await postRequestWithToken(`${API_ENDPOINTS.TRENDING_PRODUCT}/update/${id}`, formData);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update trending product");
@@ -297,7 +247,6 @@ export const deleteTrendingProduct = createAsyncThunk(
 const productSlice = createSlice({
   name: "product",
   initialState: {
-    exploreData: null,
     carouselData: null,
     trendingProductData: null,
     productCategorieData: null,
@@ -375,17 +324,6 @@ const productSlice = createSlice({
         }
       })
       .addCase(deleteCategory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(exploreCollection.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(exploreCollection.fulfilled, (state, action) => {
-        state.loading = false;
-        state.exploreData = action.payload;
-      })
-      .addCase(exploreCollection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -479,36 +417,6 @@ const productSlice = createSlice({
         state.loading = false;
       })
       .addCase(deleteCarouselItem.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(addExploreCategory.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(addExploreCategory.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(addExploreCategory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(updateExploreCategory.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(updateExploreCategory.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(updateExploreCategory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(deleteExploreCategory.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(deleteExploreCategory.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(deleteExploreCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

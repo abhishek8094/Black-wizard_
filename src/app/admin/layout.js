@@ -3,19 +3,22 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MdDashboard, MdShoppingCart, MdPeople, MdCategory, MdExplore, MdTrendingUp, MdViewCarousel, MdReceipt, MdLocationOn } from 'react-icons/md';
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/products", label: "Products" },
-    { href: "/admin/users", label: "Users" },
-    { href: "/admin/categories", label: "Categories" },
-    { href: "/admin/explore-collection", label: "Explore Collection" },
-    { href: "/admin/trending", label: "Trending Products" },
-    { href: "/admin/crousel", label: "Carousel" },
+    { href: "/admin", label: "Dashboard", icon: MdDashboard },
+    { href: "/admin/products", label: "Products", icon: MdShoppingCart },
+    { href: "/admin/users", label: "Users", icon: MdPeople },
+    { href: "/admin/categories", label: "Categories", icon: MdCategory },
+    { href: "/admin/explore-collection", label: "Explore Collection", icon: MdExplore },
+    { href: "/admin/trending", label: "Trending Products", icon: MdTrendingUp },
+    { href: "/admin/crousel", label: "Carousel", icon: MdViewCarousel },
+    { href: "/admin/orders", label: "Orders", icon: MdReceipt },
+    { href: "/admin/addresses", label: "Addresses", icon: MdLocationOn },
   ];
 
   return (
@@ -45,7 +48,7 @@ export default function AdminLayout({ children }) {
               }`}
               onClick={() => setSidebarOpen(false)}
             >
-              {item.label}
+              <item.icon className="inline mr-2 w-5 h-5" /> {item.label}
             </Link>
           ))}
         </nav>

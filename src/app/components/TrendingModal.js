@@ -1,87 +1,84 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsData }) => {
-  const [selectedProductId, setSelectedProductId] = useState(product?._id || '');
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [uploadedSubImages, setUploadedSubImages] = useState([]);
-  const [imagePreview, setImagePreview] = useState(product?.image || '');
-  const [subImagePreviews, setSubImagePreviews] = useState(product?.subImages || []);
-  const imageInputRef = useRef(null);
-  const subImageInputRef = useRef(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    size: '',
+    image: '',
+    subImg: ''
+  });
 
   useEffect(() => {
-    if (product) {
-      setSelectedProductId(product._id || '');
-      setImagePreview(product.image || '');
-      setSubImagePreviews(product.subImages || []);
+    if (isEdit && product) {
+      setFormData({
+        name: product.name || product.title || '',
+        description: product.description || '',
+        price: product.price || '',
+        category: product.category || '',
+        size: product.size || '',
+        image: product.image || '',
+        subImg: product.subImg || ''
+      });
     } else {
-      setSelectedProductId('');
-      setImagePreview('');
-      setSubImagePreviews([]);
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        category: '',
+        size: '',
+        image: '',
+        subImg: ''
+      });
     }
-  }, [product]);
+  }, [isEdit, product, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUploadedImage(file);
-      const url = URL.createObjectURL(file);
-      setImagePreview(url);
+      setFormData(prev => ({ ...prev, image: file }));
     }
   };
 
-  const handleSubImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setUploadedSubImages(prev => [...prev, ...files]);
-    setSubImagePreviews(prev => [...prev, ...newPreviews]);
-  };
-
-  const removeSubImage = (index) => {
-    setUploadedSubImages(prev => prev.filter((_, i) => i !== index));
-    setSubImagePreviews(prev => {
-      const newPreviews = prev.filter((_, i) => i !== index);
-      // Revoke object URLs to prevent memory leaks
-      URL.revokeObjectURL(prev[index]);
-      return newPreviews;
-    });
+  const handleSubImgChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, subImg: file }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('productId', selectedProductId);
-    if (uploadedImage) {
-      formData.append('image', uploadedImage);
-    }
-    uploadedSubImages.forEach((file, index) => {
-      formData.append(`subImages`, file);
-    });
-
-    onSubmit(formData, isEdit ? product._id : null);
+    const submitData = new FormData();
+    submitData.append('name', formData.name);
+    submitData.append('description', formData.description);
+    submitData.append('price', formData.price);
+    submitData.append('category', formData.category);
+    submitData.append('size', formData.size);
+    if (formData.image) submitData.append('image', formData.image);
+    if (formData.subImg) submitData.append('subImg', formData.subImg);
+    onSubmit(submitData, product?.id);
   };
 
   const handleClose = () => {
-    // Clean up object URLs
-    if (imagePreview && !product?.image) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    subImagePreviews.forEach(url => {
-      if (!product?.subImages?.includes(url)) {
-        URL.revokeObjectURL(url);
-      }
-    });
-    setUploadedImage(null);
-    setUploadedSubImages([]);
-    setImagePreview('');
-    setSubImagePreviews([]);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center text-gray-700  p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         role="dialog"
@@ -105,83 +102,117 @@ const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsDat
         {/* Form */}
         <div className="p-6">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Product Selection */}
+            {/* Name */}
             <div>
-              <label htmlFor="productSelect" className="block text-sm font-medium text-gray-700 mb-2">
-                Select Product
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                Product Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Price */}
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+                Price
+              </label>
+              <input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                value={formData.price}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Category */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Category
               </label>
               <select
-                id="productSelect"
-                value={selectedProductId}
-                onChange={(e) => setSelectedProductId(e.target.value)}
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Choose a product...</option>
-                {productsData?.filter(p => !isEdit || p._id === product._id || !product).map((prod) => (
-                  <option key={prod._id} value={prod._id}>
-                    {prod.name} - Rs. {prod.price}
-                  </option>
+                <option value="">Select Category</option>
+                {productsData?.map((cat, idx) => (
+                  <option key={idx} value={cat.category}>{cat.name}</option>
                 ))}
               </select>
             </div>
 
-            {/* Main Image Upload */}
+            {/* Size */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="size" className="block text-sm font-medium text-gray-700 mb-2">
+                Size
+              </label>
+              <input
+                id="size"
+                name="size"
+                type="text"
+                value={formData.size}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Image */}
+            <div>
+              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
                 Main Image
               </label>
-              {imagePreview && (
-                <div className="mb-4">
-                  <img
-                    src={imagePreview}
-                    alt="Main Image Preview"
-                    className="w-full h-32 object-cover rounded-md border border-gray-300"
-                  />
-                </div>
-              )}
               <input
+                id="image"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                ref={imageInputRef}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            {/* Sub Images Upload */}
+            {/* Sub Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sub Images (Multiple)
+              <label htmlFor="subImg" className="block text-sm font-medium text-gray-700 mb-2">
+                Sub Image
               </label>
               <input
+                id="subImg"
                 type="file"
                 accept="image/*"
-                multiple
-                onChange={handleSubImageChange}
-                ref={subImageInputRef}
+                onChange={handleSubImgChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {subImagePreviews.length > 0 && (
-                <div className="mt-4 grid grid-cols-3 gap-4">
-                  {subImagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Sub Image ${index + 1}`}
-                        className="w-full h-20 object-cover rounded-md border border-gray-300"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeSubImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Actions */}
@@ -196,9 +227,8 @@ const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsDat
               <button
                 type="submit"
                 className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                disabled={!selectedProductId}
               >
-                {isEdit ? "Update" : "Add"}
+                {isEdit ? "Update Product" : "Add Product"}
               </button>
             </div>
           </form>
