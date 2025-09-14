@@ -129,73 +129,104 @@ export default function AdminCarousel() {
   };
 
   return (
-    <div className="pt-4 pb-5 px-6 bg-gray-100 text-gray-700 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-700">Manage Carousel</h1>
-        <div className="flex space-x-2">
+    <div className="pt-2 pb-6 px-2 sm:px-6 bg-gray-100 text-gray-700 min-h-screen">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8 flex-nowrap">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-700">Manage Carousel</h1>
           <button
             onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm sm:text-base"
           >
             Add Item
           </button>
         </div>
-      </div>
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <CarouselModal
-          key={modalKey}
-          isOpen={isEditing}
-          onClose={handleCancel}
-          imageUrl={imageUrl}
-          setImageUrl={setImageUrl}
-          onSubmit={handleSubmit}
-          isEdit={!!editingId}
-          onFileSelect={setUploadedFile}
-        />
+        <div className="max-w-4xl mx-auto">
+          <CarouselModal
+            key={modalKey}
+            isOpen={isEditing}
+            onClose={handleCancel}
+            imageUrl={imageUrl}
+            setImageUrl={setImageUrl}
+            onSubmit={handleSubmit}
+            isEdit={!!editingId}
+            onFileSelect={setUploadedFile}
+          />
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <div className="bg-white text-gray-700 rounded shadow overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="p-4 text-left">Image</th>
-                  <th className="p-4 text-left">URL</th>
-                  <th className="p-4 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              <div className="bg-white text-gray-700 rounded shadow overflow-hidden hidden sm:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-full">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="p-2 sm:p-4 text-left">Image</th>
+                        <th className="p-2 sm:p-4 text-left">URL</th>
+                        <th className="p-2 sm:p-4 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {carouselData?.map((item, index) => (
+                        <tr key={item.id} className="border-t">
+                          <td className="p-2 sm:p-4">
+                            <img
+                              src={item.imageUrl}
+                              alt={`Carousel ${index + 1}`}
+                              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
+                            />
+                          </td>
+                          <td className="p-2 sm:p-4">{item.imageUrl}</td>
+                          <td className="p-2 sm:p-4">
+                            <button
+                              onClick={() => handleEdit(item.id, item.imageUrl)}
+                              className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 sm:px-3 sm:py-1 rounded mr-4 inline-block"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-1 rounded inline-block"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block sm:hidden">
                 {carouselData?.map((item, index) => (
-                  <tr key={item.id} className="border-t">
-                    <td className="p-4">
+                  <div key={item.id} className="bg-white rounded shadow p-4 mb-4">
+                    <div className="relative mb-2">
                       <img
                         src={item.imageUrl}
                         alt={`Carousel ${index + 1}`}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-full h-32 object-cover rounded"
                       />
-                    </td>
-                    <td className="p-4">{item.imageUrl}</td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => handleEdit(item.id, item.imageUrl)}
-                        className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-4 inline-block"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                      <div className="relative bg-opacity-50 justify-start opacity-100 mt-4 hover:opacity-100 transition-opacity duration-300 flex items-center space-x-2 rounded">
+                        <button
+                          onClick={() => handleEdit(item.id, item.imageUrl)}
+                          className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

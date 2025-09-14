@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
+
 const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
   const { productCategorieData } = useSelector((state) => state.product);
   const [formData, setFormData] = useState({
@@ -8,7 +9,8 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
     description: '',
     price: '',
     category: '',
-    images: []
+    size: '',
+    image: []
   });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -21,16 +23,18 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
         description: product.description || '',
         price: product.price || '',
         category: product.category || '',
-        images: product.images || []
+        size: product.size || '',
+        image: product.image || []
       });
-      setPreviewUrls(product.images || []);
+      setPreviewUrls(product.image || []);
     } else {
       setFormData({
         name: '',
         description: '',
         price: '',
         category: '',
-        images: []
+        size: '',
+        image: []
       });
       setPreviewUrls([]);
     }
@@ -66,17 +70,18 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
     submitData.append('description', formData.description);
     submitData.append('price', formData.price);
     submitData.append('category', formData.category);
+    submitData.append('size', formData.size);
     uploadedFiles.forEach(file => {
-      submitData.append('images', file);
+      submitData.append('image', file);
     });
     if (isEdit && product) {
-      submitData.append('existingImages', JSON.stringify(formData.images));
+      submitData.append('existingImages', JSON.stringify(formData.image));
     }
     onSubmit(submitData);
   };
 
   const handleClose = () => {
-    previewUrls.forEach(url => {
+    previewUrls?.forEach(url => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
@@ -173,18 +178,34 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
               >
                 <option value="">Select Category</option>
                 {productCategorieData?.map((cat , idx )=> (
-                  <option key={idx} value={cat._id}>{cat.name}</option>
+                  <option key={idx} value={cat.title} className='text-gray-600'>{cat.title}</option>
                 ))}
               </select>
             </div>
 
-            {/* Images */}
+            {/* Size */}
             <div>
-              <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
-                Product Images
+              <label htmlFor="size" className="block text-sm font-medium text-gray-700 mb-2">
+                Size
               </label>
               <input
-                id="images"
+                id="size"
+                name="size"
+                type="text"
+                value={formData.size}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            {/* Images */}
+            <div>
+              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                Product Image
+              </label>
+              <input
+                id="image"
                 type="file"
                 accept="image/*"
                 multiple
@@ -193,9 +214,9 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {/* Image Previews */}
-              {previewUrls.length > 0 && (
+              {/* {previewUrls?.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 gap-4">
-                  {previewUrls.map((url, index) => (
+                  {previewUrls?.map((url, index) => (
                     <div key={index} className="relative">
                       <img
                         src={url}
@@ -212,7 +233,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Actions */}

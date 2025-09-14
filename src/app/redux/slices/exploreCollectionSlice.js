@@ -34,9 +34,11 @@ export const addExploreCollection = createAsyncThunk(
 
 export const updateExploreCollection = createAsyncThunk(
   "exploreCollection/updateExploreCollection",
-  async ({ id, ...data }, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/${id}`, data);
+      const id = formData.get('id');
+      formData.delete('id');
+      const response = await postRequestWithToken(`${API_ENDPOINTS.EXPLORE_COLLECTION}/update/${id}`, formData);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update explore Collection");

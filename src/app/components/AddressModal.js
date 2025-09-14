@@ -369,7 +369,7 @@ const AddressModal = ({ isOpen, onClose, address }) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:space-x-4 space-y-3 sm:space-y-0 pt-6">
+            <div className="flex justify-between pt-6">
               <div>
                 {address && (
                   <button
@@ -382,7 +382,7 @@ const AddressModal = ({ isOpen, onClose, address }) => {
                   </button>
                 )}
               </div>
-              <div className="gap-6 flex">
+              <div className="flex gap-6">
                 <button
                   type="button"
                   onClick={onClose}

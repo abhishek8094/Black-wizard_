@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MdDashboard, MdShoppingCart, MdPeople, MdCategory, MdExplore, MdTrendingUp, MdViewCarousel, MdReceipt, MdLocationOn } from 'react-icons/md';
+import { MdDashboard, MdShoppingCart, MdPeople, MdCategory, MdExplore, MdTrendingUp, MdPhone, MdViewCarousel, MdReceipt, MdLocationOn } from 'react-icons/md';
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -19,6 +19,7 @@ export default function AdminLayout({ children }) {
     { href: "/admin/crousel", label: "Carousel", icon: MdViewCarousel },
     { href: "/admin/orders", label: "Orders", icon: MdReceipt },
     { href: "/admin/addresses", label: "Addresses", icon: MdLocationOn },
+    { href: "/admin/contact", label: "Contact", icon: MdPhone },
   ];
 
   return (
@@ -58,7 +59,7 @@ export default function AdminLayout({ children }) {
       <div className="flex-1 p-6 md:ml-0">
         {/* Hamburger Menu for Mobile */}
         <button
-          className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded shadow-lg"
+          className="md:hidden fixed top-0 left-4 z-50 bg-white p-2 rounded shadow-lg"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

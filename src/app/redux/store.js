@@ -10,6 +10,7 @@ import usersReducer from "./slices/usersSlice";
 import addressReducer from "./slices/addressSlice";
 import orderReducer from "./slices/orderSlice";
 import exploreCollectionReducer from "./slices/exploreCollectionSlice";
+import contactReducer from "./slices/contactSlice";
 
 const persistConfig = {
   key: "root",
@@ -34,6 +35,7 @@ export const store = configureStore({
     address: addressReducer,
     orders: orderReducer,
     exploreCollection: exploreCollectionReducer,
+    contacts: contactReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

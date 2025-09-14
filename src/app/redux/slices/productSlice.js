@@ -37,9 +37,11 @@ export const searchProduct = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
-  async ({ id, ...data }, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`, data);
+      const id = formData.get('id');
+      formData.delete('id');
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/update/${id}`, formData);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update product");
@@ -51,7 +53,7 @@ export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/${id}`);
+      const response = await postRequestWithToken(`${API_ENDPOINTS.PRODUCTS}/delete/${id}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to delete product");

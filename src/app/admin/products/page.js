@@ -38,9 +38,10 @@ export default function AdminProducts() {
       dispatch(productCategories());
     }, [userRole, dispatch, router]);
 
-  const handleDelete = (id) => {
+  const handleDelete = async(id) => {
     if (confirm("Are you sure you want to delete this product?")) {
       dispatch(deleteProduct(id));
+      await dispatch(getProducts())
     }
   };
 
@@ -56,11 +57,13 @@ export default function AdminProducts() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async(formData) => {
     if (isEdit) {
-      dispatch(updateProduct({ id: selectedProduct._id, ...Object.fromEntries(formData) }));
+      formData.append('id', selectedProduct._id);
+      dispatch(updateProduct(formData));
     } else {
-      dispatch(addProduct(Object.fromEntries(formData)));
+      await dispatch(addProduct(formData));
+      await dispatch(getProducts())
     }
     setIsModalOpen(false);
     dispatch(getProducts());
@@ -72,10 +75,10 @@ export default function AdminProducts() {
   }
 
   return (
-    <div className="pt-2 pb-6 px-6 bg-gray-100 min-h-screen">
+    <div className="pt-2 pb-6 px-2 sm:px-6 bg-gray-100 ">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-700">Manage Products</h1>
+        <div className="flex justify-between items-center mb-8 flex-nowrap">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-700">Manage Products</h1>
           <button onClick={openAddModal} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             Add Product
           </button>
@@ -83,41 +86,80 @@ export default function AdminProducts() {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="bg-white text-gray-700 rounded shadow overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-full">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="p-4 text-left">Name</th>
-                    <th className="p-4 text-left">Price</th>
-                    <th className="p-4 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productsData?.map((product, idx) => (
-                    <tr key={idx} className="border-t">
-                      <td className="p-4">{product.name}</td>
-                      <td className="p-4">RS. {product.price}</td>
-                      <td className="p-4">
-                        <button
-                          onClick={() => openEditModal(product)}
-                          className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-4 inline-block text-center"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product._id)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
-                        >
-                          Delete
-                        </button>
-                      </td>
+          <>
+            <div className="bg-white text-gray-700 rounded shadow overflow-hidden hidden sm:block">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-full">
+                  <thead className="bg-gray-200">
+                    <tr>
+                      <th className="p-2 sm:p-4 text-left">Name</th>
+                      <th className="p-2 sm:p-4 text-left">Category</th>
+                      <th className="p-2 sm:p-4 text-left hidden sm:table-cell">Size</th>
+                      <th className="p-2 sm:p-4 text-left">Image</th>
+                      <th className="p-2 sm:p-4 text-left">Price</th>
+                      <th className="p-2 sm:p-4 text-left">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {productsData?.map((product, idx) => (
+                      <tr key={idx} className="border-t">
+                        <td className="p-2 sm:p-4">{product.name}</td>
+                         <td className="p-2 sm:p-4">{product.category}</td>
+                        <td className="p-2 sm:p-4 hidden sm:table-cell">{product.size}</td>
+                        <td className="p-2 sm:p-4">
+                          <img src={product.image} className="w-8 h-8 sm:w-10 sm:h-10"/>
+                        </td>
+                        <td className="p-2 sm:p-4">RS. {product.price}</td>
+                        <td className="p-2 sm:p-4">
+                          <button
+                            onClick={() => openEditModal(product)}
+                            className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 sm:px-3 sm:py-1 rounded mr-4 inline-block text-center"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product._id)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-1 rounded inline-block"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+            <div className="block sm:hidden">
+              {productsData?.map((product, idx) => (
+                <div key={idx} className="bg-white rounded shadow p-4 mb-4">
+                  <div className="flex items-center mb-2">
+                    <img src={product.image} className="w-16 h-16 mr-4" />
+                    <div>
+                      <h3 className="font-bold text-gray-700">{product.name}</h3>
+                      <p className="text-gray-600">{product.category}</p>
+                      <p className="text-gray-600">{product.size}</p>
+                      <p className="text-gray-600">RS. {product.price}</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded flex-1"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product._id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex-1"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
         <ProductModal
           isOpen={isModalOpen}
