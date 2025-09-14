@@ -106,7 +106,7 @@ export default function ProductDetailPage({ params }) {
           <div className="space-y-4">
             <div className=" w-full aspect-square overflow-hidden rounded-lg bg-gray-200">
               <img
-                src={productData.imageUrl}
+                src={productData.image}
                 alt={productData.name}
                 width={600}
                 height={600}
@@ -181,7 +181,7 @@ export default function ProductDetailPage({ params }) {
               <p className="text-sm mt-5 font-medium text-gray-900 mb-2">
                 SIZE :
               </p>
-              <div className="flex flex-wrap gap-2">
+              {/* <div className="flex flex-wrap gap-2">
                 {productData?.size?.map((size) => (
                   <button
                     key={size}
@@ -195,7 +195,7 @@ export default function ProductDetailPage({ params }) {
                     {size}
                   </button>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             {/* Quantity */}

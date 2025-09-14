@@ -1,7 +1,6 @@
 import {
   getRequestWithToken,
   postRequestWithToken,
-  getRequestWithTokenAndWithoutData,
 } from "./auth";
 
 const API_ENDPOINTS = {

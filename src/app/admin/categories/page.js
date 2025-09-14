@@ -95,8 +95,6 @@ export default function AdminCategories() {
         closeModal()
         await dispatch(productCategories());
       }
-
-
     }
   };
 
@@ -109,73 +107,101 @@ export default function AdminCategories() {
   };
 
   return (
-    <div className="pt-4 pb-5 px-6 bg-gray-100 text-gray-700 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-700">Manage Categories</h1>
-        <div className="flex space-x-2">
+    <div className="pt-2 pb-6 px-2 sm:px-6 bg-gray-100 text-gray-700 ">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8 flex-nowrap">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-700">Manage Categories</h1>
           <button
             onClick={openAddModal}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm sm:text-base"
           >
             Add Category
           </button>
         </div>
-      </div>
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <CategoryModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSubmit={handleSubmit}
-          initialData={editingCategory}
-        />
+        <div className="max-w-4xl mx-auto">
+          <CategoryModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+            initialData={editingCategory}
+          />
 
-        {loading ? (
-          <p>Loading categories...</p>
-        ) : error ? (
-          <p className="text-red-600">Error: {error}</p>
-        ) : !productCategorieData || productCategorieData.length === 0 ? (
-          <p className="text-center py-8 text-gray-500">No categories found. Add your first category!</p>
-        ) : (
-          <div className="bg-white text-gray-700 rounded shadow overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="p-4 text-left">Category Name</th>
-                  <th className="p-4 text-left">Image</th>
-                  <th className="p-4 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+          {loading ? (
+            <p>Loading categories...</p>
+          ) : error ? (
+            <p className="text-red-600">Error: {error}</p>
+          ) : !productCategorieData || productCategorieData.length === 0 ? (
+            <p className="text-center py-8 text-gray-500">No categories found. Add your first category!</p>
+          ) : (
+            <>
+              <div className="bg-white text-gray-700 rounded shadow overflow-hidden hidden sm:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-full">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="p-2 sm:p-4 text-left">Category Name</th>
+                        <th className="p-2 sm:p-4 text-left">Image</th>
+                        <th className="p-2 sm:p-4 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productCategorieData.map((category,idx) => (
+                        <tr key={idx} className="border-t hover:bg-gray-50">
+                          <td className="p-2 sm:p-4">
+                            <div className="flex items-center">
+                              <span className="font-medium text-gray-900">{category.title}</span>
+                            </div>
+                          </td>
+                          <td className="p-2 sm:p-4 text-gray-600">
+                            <img src={category.image} className="w-12 h-12 sm:w-16 sm:h-16 object-cover"/>
+                          </td>
+                          <td className="p-2 sm:p-4">
+                            <button
+                              onClick={() => openEditModal(category)}
+                              className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 sm:px-3 sm:py-1 rounded mr-2 inline-block"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(category.id)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-1 rounded inline-block"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block sm:hidden">
                 {productCategorieData.map((category,idx) => (
-                  <tr key={idx} className="border-t hover:bg-gray-50">
-                    <td className="p-4">
-                      <div className="flex items-center">
-                        <span className="font-medium text-gray-900">{category.title}</span>
-                      </div>
-                    </td>
-                    <td className="p-4 text-gray-600">
-                      <img src={category.image} className="w-16 h-16"/>
-                    </td>
-                    <td className="p-4">
+                  <div key={idx} className="bg-white rounded shadow p-4 mb-4">
+                    <div className="flex items-center mb-2">
+                      <img src={category.image} className="w-12 h-12 object-cover mr-4"/>
+                      <h3 className="font-bold text-gray-700">{category.title}</h3>
+                    </div>
+                    <div className="flex space-x-2">
                       <button
                         onClick={() => openEditModal(category)}
-                        className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-2 inline-block"
+                        className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded flex-1"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(category.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex-1"
                       >
                         Delete
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

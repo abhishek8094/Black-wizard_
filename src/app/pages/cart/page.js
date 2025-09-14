@@ -95,18 +95,18 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="p-28 bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <FiShoppingCart className="mx-auto mb-4 w-16 h-16 text-gray-400" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 whitespace-nowrap">
+      <div className="p-8 sm:p-16 lg:p-28 bg-gray-50 flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md mx-auto">
+          <FiShoppingCart className="mx-auto mb-6 w-20 h-20 sm:w-24 sm:h-24 text-gray-400" />
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Your Cart is Empty
           </h1>
-          <p className="text-gray-600 mb-8 whitespace-nowrap">
+          <p className="text-gray-600 mb-8 text-lg">
             Add some products to get started!
           </p>
           <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+            className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-shadow"
           >
             Continue Shopping
           </Link>
@@ -122,83 +122,87 @@ export default function CartPage() {
           Shopping Cart
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-6">
           {/* Cart Items */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-400">
+          <div className="w-full lg:w-2/3">
+            <div className="bg-white space-y-3 ">
               {items.map((item) => (
                 <div
                   key={`${item.id}-${item.size}`}
-                  className="flex items-center p-6 border-b last:border-b-0"
+                  className="flex flex-col p-4 sm:p-6 border-b last:border-b-0 rounded-lg shadow-lg border border-gray-400"
                 >
-                  <div className="bg-gray-200 rounded-lg overflow-hidden">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      width={96}
-                      height={96}
-                      className="w-full h-36 object-cover"
-                    />
+                  <div className="flex items-center">
+                    <div className="bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 w-20 h-24 sm:w-24 sm:h-36">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        width={100}
+                        height={100}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <div className="flex-1 ml-4 text-left">
+                      <h3 className="font-semibold text-gray-900 text-lg">{item.name}</h3>
+                      <p className="text-sm text-gray-600">Size: {item.size}</p>
+                      <p className="text-lg font-bold text-gray-900 mt-1">
+                        ₹{item.price}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex-1 ml-4">
-                    <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                    <p className="text-sm text-gray-600">Size: {item.size}</p>
-                    <p className="text-lg font-bold text-gray-900">
-                      ₹{item.price}
-                    </p>
-                  </div>
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            updateQuantity({
+                              id: item.id,
+                              size: item.size,
+                              quantity: Math.max(1, item.quantity - 1),
+                            })
+                          )
+                        }
+                        className="p-1 border border-gray-600 rounded hover:bg-gray-50"
+                      >
+                        <FiMinus className="w-4 h-4" />
+                      </button>
+                      <span className="px-3 py-1">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            updateQuantity({
+                              id: item.id,
+                              size: item.size,
+                              quantity: item.quantity + 1,
+                            })
+                          )
+                        }
+                        className="p-1 border border-gray-600 rounded hover:bg-gray-50"
+                      >
+                        <FiPlus className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                  <div className="flex items-center space-x-2 text-gray-600">
                     <button
-                      onClick={() =>
+                      onClick={() => {
                         dispatch(
-                          updateQuantity({
-                            id: item.id,
-                            size: item.size,
-                            quantity: Math.max(1, item.quantity - 1),
-                          })
-                        )
-                      }
-                      className="p-1 border border-gray-600 rounded hover:bg-gray-50"
+                          removeFromCart({ id: item.id, size: item.size })
+                        );
+                        toast.success("Item removed from the cart");
+                      }}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded"
                     >
-                      <FiMinus className="w-4 h-4" />
-                    </button>
-                    <span className="px-3 py-1">{item.quantity}</span>
-                    <button
-                      onClick={() =>
-                        dispatch(
-                          updateQuantity({
-                            id: item.id,
-                            size: item.size,
-                            quantity: item.quantity + 1,
-                          })
-                        )
-                      }
-                      className="p-1 border border-gray-600 rounded hover:bg-gray-50"
-                    >
-                      <FiPlus className="w-4 h-4" />
+                      <FiTrash2 className="w-5 h-5" />
                     </button>
                   </div>
-
-                  <button
-                    onClick={() => {
-                      dispatch(
-                        removeFromCart({ id: item.id, size: item.size })
-                      );
-                      toast.success("Item removed from the cart");
-                    }}
-                    className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded"
-                  >
-                    <FiTrash2 className="w-5 h-5" />
-                  </button>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Order Summary */}
-          <div className=" text-gray-800 rounded-lg shadow-lg p-6 border border-gray-400">
+          <div className="w-full lg:w-1/3 text-gray-800 rounded-lg shadow-lg p-6 border border-gray-400">
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
             <div className="space-y-2 mb-4">

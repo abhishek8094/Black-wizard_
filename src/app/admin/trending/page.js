@@ -94,60 +94,85 @@ export default function AdminTrending() {
 
   return (
     <>
-      <div className="pt-2 pb-6 px-6 bg-gray-100 min-h-screen">
+      <div className="pt-2 pb-6 px-2 sm:px-6 bg-gray-100 ">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-700">Manage Trending Products</h1>
-            <div className="flex space-x-2">
-              <button
-                onClick={handleOpenAddModal}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Add Product
-              </button>
-            </div>
+          <div className="flex justify-between items-center mb-8 flex-nowrap space-x-4">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-700 ">Manage Trending Products</h1>
+            <button
+              onClick={handleOpenAddModal}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm sm:text-base whitespace-nowrap"
+            >
+              Add Product
+            </button>
           </div>
 
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <div className="bg-white text-gray-700 rounded shadow overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-full">
-                  <thead className="bg-gray-200">
-                    <tr>
-                      <th className="p-4 text-left">Name</th>
-                      <th className="p-4 text-left">Price</th>
-                      <th className="p-4 text-left">Size</th>
-                      <th className="p-4 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {trendingProductData?.map((product, idx) => (
-                      <tr key={idx} className="border-t">
-                        <td className="p-4">{product.title || product.name}</td>
-                        <td className="p-4">Rs. {product.price}</td>
-                        <td className="p-4">{product.size || 'N/A'}</td>
-                        <td className="p-4">
-                          <button
-                            onClick={() => handleOpenEditModal(product)}
-                            className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded mr-4 inline-block text-center"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded inline-block"
-                          >
-                            Delete
-                          </button>
-                        </td>
+            <>
+              <div className="bg-white text-gray-700 rounded shadow overflow-hidden hidden sm:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-full">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="p-2 sm:p-4 text-left">Name</th>
+                        <th className="p-2 sm:p-4 text-left">Price</th>
+                        <th className="p-2 sm:p-4 text-left">Size</th>
+                        <th className="p-2 sm:p-4 text-left">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {trendingProductData?.map((product, idx) => (
+                        <tr key={idx} className="border-t">
+                          <td className="p-2 sm:p-4">{product.title || product.name}</td>
+                          <td className="p-2 sm:p-4">Rs. {product.price}</td>
+                          <td className="p-2 sm:p-4">{product.size || 'N/A'}</td>
+                          <td className="p-2 sm:p-4">
+                            <button
+                              onClick={() => handleOpenEditModal(product)}
+                              className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 sm:px-3 sm:py-1 rounded mr-4 inline-block text-center"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-1 rounded inline-block"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+              <div className="block sm:hidden">
+                {trendingProductData?.map((product, idx) => (
+                  <div key={idx} className="bg-white rounded shadow p-4 mb-4">
+                    <div>
+                      <h3 className="font-bold text-gray-700">{product.title || product.name}</h3>
+                      <p className="text-gray-600">Rs. {product.price}</p>
+                      <p className="text-gray-600">{product.size || 'N/A'}</p>
+                    </div>
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        onClick={() => handleOpenEditModal(product)}
+                        className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded flex-1"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex-1"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>

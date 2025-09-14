@@ -1,14 +1,13 @@
 "use client";
 import React from "react";
 import { useDispatch } from "react-redux";
-// import { addAllcontactus } from "@/app/redux/productSlice";
+import { createContact } from "@/app/redux/slices/contactSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-// import Loading from "../common/loading";
 
 const  ContactUs = () => {
-//   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -49,15 +48,15 @@ const  ContactUs = () => {
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
-    //   try {
-    //     const response = await dispatch(addAllcontactus(values));
-    //     if (response.payload.statusCode === 200) {
-    //       toast.success(" Request sent Successfully!");
-    //     }
-    //     resetForm();
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
+      try {
+        const result = await dispatch(createContact(values));
+        if (createContact.fulfilled.match(result)) {
+          toast.success("Request sent Successfully!");
+          resetForm();
+        }
+      } catch (err) {
+        console.log(err);
+      }
     },
   });
 
@@ -216,7 +215,7 @@ const  ContactUs = () => {
                 type="submit"
                 className="bg-secondary cursor-pointer text-black px-4 py-2 md:px-6 md:py-3 rounded-md  shadow-md roboto-font text-sm md:text-base"
               >
-                {formik.isSubmitting ? Load : "SEND MESSAGE"}
+              {formik.isSubmitting ? "Loading..." : "SEND MESSAGE"}
               </button>
             </div>
           </form>

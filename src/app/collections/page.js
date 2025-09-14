@@ -398,7 +398,7 @@ const ProductCard = ({ product, layout, slug }) => {
           }`}
         >
           <img
-            src={product.imageUrl}
+            src={product.image}
             alt={product.name}
             width={500}
             height={500}

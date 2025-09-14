@@ -9,7 +9,7 @@ const ExploreCollection = () => {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("all");
   const [hoveredProduct, setHoveredProduct] = useState(null);
-  const { exploreData } = useSelector((state) => state.product);
+  const { exploreData } = useSelector((state) => state.exploreCollection);
 
   useEffect(() => {
     dispatch(exploreCollection());
