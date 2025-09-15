@@ -103,7 +103,7 @@ export default function AdminUsers() {
                         <td className="p-2 sm:p-4">{user.firstName}</td>
                         <td className="p-2 sm:p-4">{user.lastName}</td>
                         <td className="p-2 sm:p-4">{user.email}</td>
-                        <td className="p-2 sm:p-4"></td>
+                        <td className="p-2 sm:p-4">{user.password}</td>
                         <td className="p-2 sm:p-4">{user.role}</td>
                         <td className="p-2 sm:p-4">
                           <button

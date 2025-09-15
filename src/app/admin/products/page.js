@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
-import { getProducts, deleteProduct, addProduct, updateProduct, getProductById, productCategories } from "@/app/redux/slices/productSlice";
+import { getProducts, deleteProduct, addProduct, updateProduct,  productCategories } from "@/app/redux/slices/productSlice";
 import ProductModal from "@/app/components/ProductModal";
 
 export default function AdminProducts() {
@@ -40,7 +41,10 @@ export default function AdminProducts() {
 
   const handleDelete = async(id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      dispatch(deleteProduct(id));
+      const result = await dispatch(deleteProduct(id)).unwrap();
+      if(result.success === true){
+        toast.success(result.message);
+      }
       await dispatch(getProducts())
     }
   };
@@ -60,9 +64,17 @@ export default function AdminProducts() {
   const handleSubmit = async(formData) => {
     if (isEdit) {
       formData.append('id', selectedProduct._id);
-      dispatch(updateProduct(formData));
+      const result = await dispatch(updateProduct(formData)).unwrap();
+      if(result.success === true){
+        toast.success("product Updated Suceesfully")
+      }
+      await dispatch(getProducts())
     } else {
-      await dispatch(addProduct(formData));
+      const result = await dispatch(addProduct(formData)).unwrap();
+      console.log(result)
+      if(result.success === true){
+        toast.success("Product Added Successfully");
+      }
       await dispatch(getProducts())
     }
     setIsModalOpen(false);
@@ -110,7 +122,7 @@ export default function AdminProducts() {
                           <img src={product.image} className="w-8 h-8 sm:w-10 sm:h-10"/>
                         </td>
                         <td className="p-2 sm:p-4">RS. {product.price}</td>
-                        <td className="p-2 sm:p-4">
+                        <td className="p-2 sm:p-4 space-y-2">
                           <button
                             onClick={() => openEditModal(product)}
                             className="text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 sm:px-3 sm:py-1 rounded mr-4 inline-block text-center"
@@ -142,7 +154,7 @@ export default function AdminProducts() {
                       <p className="text-gray-600">RS. {product.price}</p>
                     </div>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 ">
                     <button
                       onClick={() => openEditModal(product)}
                       className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded flex-1"

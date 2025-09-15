@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { createUser, updateUser } from "../redux/slices/usersSlice";
 import { fetchUsers } from "../redux/slices/usersSlice";
+import { toast } from "react-toastify";
 
 const UserModal = ({ isOpen, onClose, user }) => {
 
@@ -45,10 +46,16 @@ const UserModal = ({ isOpen, onClose, user }) => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (user) {
-      await dispatch(updateUser({ id: user._id, data: formData }));
+      const result = await dispatch(updateUser({ id: user._id, data: formData })).unwrap();
+      if(result){
+        toast.success("User Updated Successfully!")
+      }
       await dispatch(fetchUsers())
     } else {
-      await dispatch(createUser(formData));
+      const result = await dispatch(createUser(formData)).unwrap();
+      if(result){
+        toast.success("User added Sucessfully!")
+      }
       await dispatch(fetchUsers())
   
       setFormData({
