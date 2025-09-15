@@ -171,9 +171,18 @@ export const addCarouselItem = createAsyncThunk(
 
 export const updateCarouselItem = createAsyncThunk(
   "product/updateCarouselItem",
-  async ({ id, ...data }, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/update`, data);
+      let id, payload;
+      if (data instanceof FormData) {
+        id = data.get('id');
+        data.delete('id');
+        payload = data;
+      } else {
+        id = data.id;
+        payload = {   id:id, imageUrl: data.imageUrl };
+      }
+      const response = await postRequestWithToken(`${API_ENDPOINTS.CAROUSEL}/update`, payload);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update carousel item");

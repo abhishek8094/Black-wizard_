@@ -26,7 +26,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
         size: product.size || '',
         image: product.image || []
       });
-      setPreviewUrls(product.image || []);
+      setPreviewUrls(Array.isArray(product.image) ? product.image : []);
     } else {
       setFormData({
         name: '',
@@ -214,7 +214,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {/* Image Previews */}
-              {/* {previewUrls?.length > 0 && (
+              {previewUrls?.length > 0 && (
                 <div className="mt-4 grid grid-cols-3 gap-4">
                   {previewUrls?.map((url, index) => (
                     <div key={index} className="relative">
@@ -233,7 +233,7 @@ const ProductModal = ({ isOpen, onClose, product, onSubmit, isEdit }) => {
                     </div>
                   ))}
                 </div>
-              )} */}
+              )}
             </div>
 
             {/* Actions */}

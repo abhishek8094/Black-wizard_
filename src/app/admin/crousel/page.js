@@ -80,14 +80,16 @@ export default function AdminCarousel() {
     try {
       if (editingId) {
         if (uploadedFile) {
-          // Send FormData with file for update
+          // Send FormData with file and id for update
           const data = new FormData();
+          data.append('id', editingId);
           data.append('image', uploadedFile);
-          const result = await dispatch(updateCarouselItem({ id: editingId, data })).unwrap();
+          const result = await dispatch(updateCarouselItem(data)).unwrap();
           if (result.success === true) {
             toast.success(result.message);
           }
         } else {
+          // Send JSON payload with id and imageUrl for update
           const result = await dispatch(updateCarouselItem({ id: editingId, imageUrl })).unwrap();
           if (result.success === true) {
             toast.success(result.message);
