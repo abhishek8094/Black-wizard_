@@ -48,22 +48,23 @@ const ExploreCollection = () => {
 
   return (
     <div className="pt-4 pb-16 bg-white">
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+      {/* Section Heading */}
+      <div className="text-center mb-10 px-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Explore Collection
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Discover premium fitness wear for every workout
         </p>
       </div>
 
       {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-8 px-2 sm:px-4">
         {categories.map((category, idx) => (
           <button
             key={idx}
             onClick={() => setActiveCategory(category.id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
               activeCategory === category.id
                 ? "bg-gray-900 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -75,41 +76,35 @@ const ExploreCollection = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-2 sm:px-4 gap-4 sm:gap-6">
         {filteredProducts?.map((product, idx) => (
           <div
             key={idx}
-            className="group relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
+            className="group relative bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
             onMouseEnter={() => setHoveredProduct(product.id)}
             onMouseLeave={() => setHoveredProduct(null)}
             onClick={() => handleProductClick(product.id)}
           >
             {/* Image Container */}
-            <div className="relative aspect-square overflow-hidden">
+            <div className="relative aspect-square overflow-hidden flex items-center justify-center bg-gray-50">
               <img
-                className="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105"
+                className="max-h-full max-w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 src={product.image}
                 alt={product.title}
-                width={500}
-                height={500}
-                quality={100}
               />
-              
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
             </div>
 
             {/* Product Info */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+            <div className="p-3 sm:p-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
                 {product.title}
               </h3>
 
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <div>
-                  <span className="text-xl font-bold text-gray-900">
+                  <span className="text-lg sm:text-xl font-bold text-gray-900">
                     Rs. {product.price}
                   </span>
-                 
                 </div>
               </div>
             </div>
@@ -118,10 +113,10 @@ const ExploreCollection = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="text-center mt-12">
+      <div className="text-center mt-10 sm:mt-12 px-4">
         <Link
           href="#"
-          className="inline-flex items-center bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
+          className="inline-flex items-center bg-gray-900 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium text-sm sm:text-base"
         >
           Shop All Products
           <svg
