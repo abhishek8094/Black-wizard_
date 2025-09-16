@@ -78,7 +78,7 @@ const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsDat
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 text-gray-600 bg-black bg-opacity-50">
       <div
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         role="dialog"
@@ -162,7 +162,7 @@ const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsDat
                 value={formData.category}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                
               >
                 <option value="">Select Category</option>
                 {productsData?.map((cat, idx) => (

@@ -59,10 +59,10 @@ const CollectionsContent = () => {
         result.sort((a, b) => b.price - a.price);
         break;
       case "title-ascending":
-        result.sort((a, b) => a.title.localeCompare(b.title));
+        result.sort((a, b) => a.title?.localeCompare(b.title));
         break;
       case "title-descending":
-        result.sort((a, b) => b.title.localeCompare(a.title));
+        result.sort((a, b) => b.title?.localeCompare(a.title));
         break;
       default:
         break;
@@ -403,7 +403,7 @@ const ProductCard = ({ product, layout, slug }) => {
             width={500}
             height={500}
             quality={100}
-            className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] object-cover"
+            className="w-full h-[480px]  md:h-[480px] lg:h-[480px] object-cover"
           />
         </div>
         <div
