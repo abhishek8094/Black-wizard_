@@ -27,10 +27,10 @@ import { getToken } from "../api/auth";
 
 export default function Navbar() {
   const route = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isOpenProfile, setIsOpenProfile] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   const pathname = usePathname();
   const dispatch = useDispatch();
@@ -42,11 +42,18 @@ export default function Navbar() {
   const isVisible = useSelector(selectAnnouncementVisible);
 
   const handleLogOut = async () => {
-    const result = await dispatch(logout()).unwrap();
-    if (result.success === true) {
-      toast.success(result.message);
-      doLogout();
-      route.push("/");
+    try {
+      const result = await dispatch(logout()).unwrap();
+      if (result.success === true) {
+        toast.success(result.message);
+        doLogout();
+        route.push("/");
+      } else {
+        toast.error("Logout failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during logout");
+      console.error("Logout error:", error);
     }
   };
 
@@ -132,11 +139,14 @@ export default function Navbar() {
         try {
           const parsed = JSON.parse(profile);
           setUserEmail(parsed.email || null);
+          setUserRole(parsed.role || null);
         } catch (e) {
           setUserEmail(null);
+          setUserRole(null);
         }
       } else {
         setUserEmail(null);
+        setUserRole(null);
       }
     }
   }, []);
@@ -213,9 +223,7 @@ export default function Navbar() {
                 <div
                   className="relative hover:bg-slate-200 rounded-lg"
                   ref={userMenuRef}
-                  onMouseEnter={() => setIsUserMenuOpen(true)}
-                  onMouseLeave={() => setIsUserMenuOpen(false)}
-                  onClick={handleClick}
+                  onClick={() => setIsOpenProfile(!isOpenProfile)}
                 >
                   <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
                     <div className="text-xl flex items-center space-x-1">
@@ -318,15 +326,21 @@ export default function Navbar() {
                     onMouseEnter={() => setIsUserMenuOpen(true)}
                     onMouseLeave={() => setIsUserMenuOpen(false)}
                   >
-                    <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                    <button
+                      className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+                    >
                       <div className="text-xl flex items-center">
                         <FaUser aria-label="Profile" />
                       </div>
                     </button>
                     {isUserMenuOpen && (
                       <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                        <Link
-                          href="/pages/orders"
+                        <button
+                          onClick={() => {
+                          
+                            route.push('/pages/orders');
+                              setIsUserMenuOpen(false);
+                          }}
                           className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                             pathname === "/pages/orders"
                               ? "text-blue-600 border-b-2 border-blue-600"
@@ -334,16 +348,29 @@ export default function Navbar() {
                           }`}
                         >
                           Dashboard
-                        </Link>
+                        </button>
 
                         <Link
                           href="/account/user-profile"
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
                         >
                           Addresses
                         </Link>
+                        {userRole === 'admin' && (
+                          <Link
+                            href="/admin"
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            Admin
+                          </Link>
+                        )}
                         <button
-                          onClick={handleLogOut}
+                          onClick={() => {
+                            handleLogOut();
+                            setIsUserMenuOpen(false);
+                          }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           Log Out
@@ -551,8 +578,6 @@ export default function Navbar() {
               <div
                 className="relative"
                 ref={userMenuRef}
-                onMouseEnter={() => setIsUserMenuOpen(true)}
-                onMouseLeave={() => setIsUserMenuOpen(false)}
               >
                 <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
                   <div className="text-xl flex items-center">
@@ -561,8 +586,11 @@ export default function Navbar() {
                 </button>
                 {isUserMenuOpen && (
                   <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <Link
-                      href="/pages/orders"
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        route.push('/pages/orders');
+                      }}
                       className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                         pathname === "/pages/orders"
                           ? "text-blue-600 border-b-2 border-blue-600"
@@ -570,16 +598,29 @@ export default function Navbar() {
                       }`}
                     >
                       Dashboard
-                    </Link>
+                    </button>
 
                     <Link
                       href="/account/user-profile"
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
                     >
                       Addresses
                     </Link>
+                    {userRole === 'admin' && (
+                      <Link
+                        href="/admin"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        Admin
+                      </Link>
+                    )}
                     <button
-                      onClick={handleLogOut}
+                      onClick={() => {
+                        handleLogOut();
+                        setIsUserMenuOpen(false);
+                      }}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Log Out

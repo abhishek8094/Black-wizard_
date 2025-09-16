@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { exploreCollection } from "@/app/redux/slices/exploreCollectionSlice";
+import Link from "next/link";
 
 const ExploreCollection = () => {
   const dispatch = useDispatch();
@@ -118,8 +119,8 @@ const ExploreCollection = () => {
 
       {/* CTA Section */}
       <div className="text-center mt-12">
-        <a
-          href="/products"
+        <Link
+          href="#"
           className="inline-flex items-center bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
         >
           Shop All Products
@@ -136,7 +137,7 @@ const ExploreCollection = () => {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </a>
+        </Link>
       </div>
     </div>
   );
