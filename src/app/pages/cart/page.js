@@ -128,7 +128,7 @@ export default function CartPage() {
             <div className="bg-white space-y-3 ">
               {items.map((item) => (
                 <div
-                  key={`${item.id}-${item.size}`}
+                  key={`${item._id}-${item.size}`}
                   className="flex flex-col p-4 sm:p-6 border-b last:border-b-0 rounded-lg shadow-lg border border-gray-400"
                 >
                   <div className="flex items-center">
@@ -157,7 +157,7 @@ export default function CartPage() {
                         onClick={() =>
                           dispatch(
                             updateQuantity({
-                              id: item.id,
+                              id: item._id,
                               size: item.size,
                               quantity: Math.max(1, item.quantity - 1),
                             })
@@ -172,7 +172,7 @@ export default function CartPage() {
                         onClick={() =>
                           dispatch(
                             updateQuantity({
-                              id: item.id,
+                              id: item._id,
                               size: item.size,
                               quantity: item.quantity + 1,
                             })
@@ -187,7 +187,7 @@ export default function CartPage() {
                     <button
                       onClick={() => {
                         dispatch(
-                          removeFromCart({ id: item.id, size: item.size })
+                          removeFromCart({ id: item._id, size: item.size })
                         );
                         toast.success("Item removed from the cart");
                       }}

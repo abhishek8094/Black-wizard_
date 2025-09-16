@@ -35,7 +35,7 @@ const ShortsListing= () => {
   return (
     <section className="w-full bg-white mb-12">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">
+        <h2 className="text-2xl text-gray-600 md:text-3xl font-bold text-center mb-2">
           Shorts Video{" "}
         </h2>
         <p className="text-gray-600 text-center max-w-2xl mx-auto mb-8">

@@ -179,7 +179,7 @@ export default function ProductDetailPage({ params }) {
                 <span className="font-medium">Size Guide</span>
               </div>
               <p className="text-sm mt-5 font-medium text-gray-900 mb-2">
-                SIZE :
+                SIZE : <span>{productData.size}</span>
               </p>
               {/* <div className="flex flex-wrap gap-2">
                 {productData?.size?.map((size) => (
@@ -197,26 +197,6 @@ export default function ProductDetailPage({ params }) {
                 ))}
               </div> */}
             </div>
-
-            {/* Quantity */}
-            {/* <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-2">Quantity</h3>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  -
-                </button>
-                <span className="px-4 py-1">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  +
-                </button>
-              </div>
-            </div> */}
 
             {/* Action Buttons */}
             <div className="flex space-x-4">
