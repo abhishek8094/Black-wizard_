@@ -3,9 +3,9 @@ import React from 'react';
 
 const LogoCarousel = () => {
   return (
-    <div className="bg-gray-100 mb-12">
-      <div className="container mx-auto">
-        <div className="flickity-slider flex space-x-4 overflow-hidden">
+    <div className="bg-gray-100 mb-12 ">
+      <div className="container mx-auto ">
+        <div className="flickity-slider flex space-x-4 overflow-hidden mt-5">
           <div className="flex-shrink-0 w-1/5 text-center">
             <div className="relative">
               <div className="aspect-w-3 aspect-h-1 bg-cover bg-center" style={{ backgroundImage: "url('//coitonic.com/cdn/shop/files/0_1zVT_HIhhSlY8ruP.png?v=1752921244')" }}>

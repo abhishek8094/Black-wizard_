@@ -21,7 +21,7 @@ export default function TrendingProducts() {
   };
   return (
     <section className="pt-40 pb-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Trending Right Now
@@ -53,12 +53,6 @@ export default function TrendingProducts() {
                   className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
 
-                {/* Quick View Overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
-                  <button className="opacity-0 group-hover:opacity-100 bg-white text-gray-900 px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                    Quick View
-                  </button>
-                </div>
               </div>
 
               {/* Product Info */}
