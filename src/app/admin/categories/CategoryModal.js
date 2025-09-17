@@ -1,39 +1,59 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 export default function CategoryModal({ isOpen, onClose, onSubmit, initialData }) {
-  console.log("in",initialData)
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState(null);
-  console.log(image)
   const [imagePreview, setImagePreview] = useState("");
 
+  // Validation schema
+  const validationSchema = Yup.object({
+    title: Yup.string()
+      .required("Category title is required")
+      .min(2, "Title must be at least 2 characters")
+      .max(50, "Title must be less than 50 characters"),
+    image: Yup.mixed()
+      .test("fileSize", "File size must be less than 5MB", (value) => {
+        if (!value) return true; // Allow empty for updates
+        return value.size <= 5 * 1024 * 1024;
+      })
+      .test("fileType", "Only image files are allowed", (value) => {
+        if (!value) return true; // Allow empty for updates
+        return value && ["image/jpeg", "image/jpg", "image/png", "image/gif"].includes(value.type);
+      })
+  });
+
+  // Initial values
+  const initialValues = {
+    title: initialData?.title || "",
+    image: null
+  };
+
   useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title || "");
-      setImage(null); // Reset image file state
-      setImagePreview(initialData.image || "");
+    if (initialData?.image) {
+      setImagePreview(initialData.image);
     } else {
-      setTitle("");
-      setImage(null);
       setImagePreview("");
     }
   }, [initialData]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (title.trim() === "") {
-      alert("Category title is required");
-      return;
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      await onSubmit({ 
+        title: values.title,
+        image: values.image,
+        id: initialData?.id 
+      });
+      resetForm();
+      setImagePreview("");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setSubmitting(false);
     }
-    await onSubmit({ title: title ,image:image });
-    // Reset form
-    setTitle("");
-    setImage(null);
-    setImagePreview("");
   };
 
   return (
@@ -60,67 +80,78 @@ export default function CategoryModal({ isOpen, onClose, onSubmit, initialData }
 
         {/* Form */}
         <div className="p-6">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Category Name */}
-            <div>
-              <label htmlFor="categoryName" className="block text-sm font-medium text-gray-700 mb-2">
-                Category Name
-              </label>
-              <input
-                id="categoryName"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter category title"
-                required
-              />
-            </div>
-
-            {/* Category Image */}
-            <div>
-              <label htmlFor="categoryImage" className="block text-sm font-medium text-gray-700 mb-2">
-                Category Image
-              </label>
-              <input
-                id="categoryImage"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setImage(file);
-                    const reader = new FileReader();
-                    reader.onload = () => setImagePreview(reader.result);
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {imagePreview && (
-                <div className="mt-2">
-                  <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-md" />
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+            enableReinitialize={true}
+          >
+            {({ setFieldValue, isSubmitting }) => (
+              <Form className="space-y-6">
+                {/* Category Name */}
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                    Category Name *
+                  </label>
+                  <Field
+                    id="title"
+                    name="title"
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter category title"
+                  />
+                  <ErrorMessage name="title" component="div" className="text-red-500 text-sm mt-1" />
                 </div>
-              )}
-            </div>
 
-            {/* Actions */}
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                {initialData ? "Update" : "Add"}
-              </button>
-            </div>
-          </form>
+                {/* Category Image */}
+                <div>
+                  <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                    Category Image {!initialData && "*"}
+                  </label>
+                  <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setFieldValue("image", file);
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => setImagePreview(reader.result);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage name="image" component="div" className="text-red-500 text-sm mt-1" />
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-md" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? "Saving..." : (initialData ? "Update" : "Add")}
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </div>
       </div>
     </div>

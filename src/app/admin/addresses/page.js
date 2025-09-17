@@ -9,6 +9,7 @@ import {
   deleteAddress,
 } from "@/app/redux/slices/addressSlice";
 import AddressModal from "@/app/components/AddressModal";
+import { toast } from "react-toastify";
 
 export default function AdminAddresses() {
   const { userData } = useSelector((state) => state.auth);
@@ -68,11 +69,13 @@ export default function AdminAddresses() {
     setEditingAddress(null);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this address?")) {
-      dispatch(deleteAddress(id)).then(() => {
-        dispatch(fetchAddresses());
-      });
+      const result = await dispatch(deleteAddress(id)).unwrap();
+      if (result?.success === true) {
+        toast.success(result.message || "Address deleted successfully");
+      }
+      await dispatch(fetchAddresses());
     }
   };
 

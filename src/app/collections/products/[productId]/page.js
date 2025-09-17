@@ -13,9 +13,13 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "@/app/redux/slices/wishlistSlice";
+import { fetchAddresses } from "@/app/redux/slices/addressSlice";
+import { getToken } from "@/app/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function ProductDetailPage({ params }) {
   const dispatch = useDispatch();
+  const router = useRouter();
   const unwrappedParams = React.use(params);
   const { productId } = unwrappedParams;
   const [selectedSize, setSelectedSize] = useState("");
@@ -25,10 +29,18 @@ export default function ProductDetailPage({ params }) {
   const { productData } = useSelector((state) => state.product);
   const cartItems = useSelector(selectCartItems);
   const wishlistItems = useSelector(selectWishlistItems);
+  const { addressesData } = useSelector((state) => state.address);
+  const token = getToken();
 
   useEffect(() => {
     dispatch(getProductById(productId));
   }, [dispatch, productId]);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAddresses());
+    }
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (productData) {
@@ -76,6 +88,20 @@ export default function ProductDetailPage({ params }) {
   };
 
   const handleBuyNow = async () => {
+    // Check if user is logged in
+    if (!token) {
+      toast.error("Please login to proceed with purchase");
+      router.push("/home/login");
+      return;
+    }
+
+    // Check if user has any addresses
+    if (!addressesData?.data || addressesData.data.length === 0) {
+      toast.error("Please add a shipping address before proceeding to purchase");
+      router.push("/account/user-profile");
+      return;
+    }
+
     const amount = productData.price * quantity;
     const response = await fetch("/api/razorpay", {
       method: "POST",

@@ -10,11 +10,11 @@ export const initiateRazorpayCheckout = (data) => {
 
   const options = {
     key: data.key,
-    amount: data.order.amount,
-    currency: data.order.currency,
+    amount: data.order?.amount,
+    currency: data.order?.currency,
     name: "Black-Wizard",
     description: "Purchase Description",
-    order_id: data.order.id,
+    order_id: data.order?.id,
     handler: function (response) {
       window.location.href = `/pages/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
     },
