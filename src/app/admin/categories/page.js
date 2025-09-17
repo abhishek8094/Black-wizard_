@@ -10,6 +10,7 @@ import {
   deleteCategory,
 } from "@/app/redux/slices/productSlice";
 import CategoryModal from "./CategoryModal";
+import { toast } from "react-toastify";
 
 export default function AdminCategories() {
   const { userData } = useSelector((state) => state.auth);
@@ -19,7 +20,6 @@ export default function AdminCategories() {
     error,
   } = useSelector((state) => state.product);
 
-  //console.log(productCategorieData)
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -81,28 +81,33 @@ export default function AdminCategories() {
         formData.append("image", category.image);
       }
       // If no new image, don't append, let backend keep existing image
-      await dispatch(updateCategory({ id: category.id, data: formData })).then(() => {
-        closeModal();
-        dispatch(productCategories());
-      });
+      const result = await dispatch(updateCategory({ id: category.id, data: formData })).unwrap();
+      if (result?.success === true) {
+        toast.success(result.message || "Category updated successfully");
+      }
+      closeModal();
+      await dispatch(productCategories());
     } else {
       // For add, append image if provided
       if (category.image) {
         formData.append("image", category.image);
       }
       const result = await dispatch(addCategory(formData)).unwrap();
-      if(result.success === true){
-        closeModal()
+      if (result.success === true) {
+        toast.success(result.message || "Category added successfully");
+        closeModal();
         await dispatch(productCategories());
       }
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this category?")) {
-      dispatch(deleteCategory(id)).then(() => {
-        dispatch(productCategories());
-      });
+      const result = await dispatch(deleteCategory(id)).unwrap();
+      if (result?.success === true) {
+        toast.success(result.message || "Category deleted successfully");
+      }
+      await dispatch(productCategories());
     }
   };
 

@@ -71,7 +71,6 @@ export default function AdminProducts() {
       await dispatch(getProducts())
     } else {
       const result = await dispatch(addProduct(formData)).unwrap();
-      console.log(result)
       if(result.success === true){
         toast.success("Product Added Successfully");
       }

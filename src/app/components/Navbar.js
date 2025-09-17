@@ -335,20 +335,17 @@ export default function Navbar() {
                     </button>
                     {isUserMenuOpen && (
                       <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                        <button
-                          onClick={() => {
-                          
-                            route.push('/pages/orders');
-                              setIsUserMenuOpen(false);
-                          }}
+                        <Link
+                          href="/pages/orders"
                           className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                             pathname === "/pages/orders"
                               ? "text-blue-600 border-b-2 border-blue-600"
                               : "text-gray-700"
                           }`}
+                          onClick={() => setIsUserMenuOpen(false)}
                         >
                           Dashboard
-                        </button>
+                        </Link>
 
                         <Link
                           href="/account/user-profile"
@@ -579,26 +576,27 @@ export default function Navbar() {
                 className="relative"
                 ref={userMenuRef}
               >
-                <button className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                <button 
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="relative flex items-center justify-center px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+                >
                   <div className="text-xl flex items-center">
                     <FaUser aria-label="Profile" />
                   </div>
                 </button>
                 {isUserMenuOpen && (
                   <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <button
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        route.push('/pages/orders');
-                      }}
+                    <Link
+                      href="/pages/orders"
                       className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                         pathname === "/pages/orders"
                           ? "text-blue-600 border-b-2 border-blue-600"
                           : "text-gray-700"
                       }`}
+                      onClick={() => setIsUserMenuOpen(false)}
                     >
                       Dashboard
-                    </button>
+                    </Link>
 
                     <Link
                       href="/account/user-profile"

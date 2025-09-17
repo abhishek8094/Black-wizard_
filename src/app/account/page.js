@@ -10,6 +10,22 @@ export default function AccountPage() {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);
   const loading = useSelector((state) => state.auth.loading);
+  const [localProfile, setLocalProfile] = useState(null);
+  const [localRole, setLocalRole] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedProfile = localStorage.getItem("userProfile");
+        const parsed = storedProfile ? JSON.parse(storedProfile) : null;
+        setLocalProfile(parsed);
+      } catch (_) {
+        setLocalProfile(null);
+      }
+      const roleFromStorage = localStorage.getItem("userRole") || "";
+      setLocalRole(roleFromStorage);
+    }
+  }, []);
 
   const handleSignOut = async () => {
     await dispatch(logout());
@@ -31,26 +47,36 @@ export default function AccountPage() {
          <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Name</label>
-            <p className="mt-1 text-lg">{userData?.name}</p>
+            <p className="mt-1 text-lg">
+              {(localProfile?.firstName || "") + (localProfile?.lastName ? ` ${localProfile.lastName}` : "") || userData?.user?.name || userData?.name || ""}
+            </p>
           </div>
           
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
-            <p className="mt-1 text-lg">{userData?.email}</p>
+            <p className="mt-1 text-lg">{localProfile?.email || userData?.user?.email || userData?.email || ""}</p>
           </div>
+          {(localProfile?.role || localRole) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Role</label>
+              <p className="mt-1 text-lg">{localProfile?.role || localRole}</p>
+            </div>
+          )}
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Account Created</label>
-            <p className="mt-1 text-lg">
-              {new Date(userData?.createdAt).toLocaleDateString()}
-            </p>
-          </div>
+          {(userData?.createdAt || userData?.user?.createdAt) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Account Created</label>
+              <p className="mt-1 text-lg">
+                {new Date(userData?.createdAt || userData?.user?.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          )}
           
-          {userData?.lastSignIn && (
+          {(userData?.lastSignIn || userData?.user?.lastSignIn) && (
             <div>
               <label className="block text-sm font-medium text-gray-700">Last Sign In</label>
               <p className="mt-1 text-lg">
-                {new Date(userData?.lastSignIn).toLocaleDateString()}
+                {new Date(userData?.lastSignIn || userData?.user?.lastSignIn).toLocaleDateString()}
               </p>
             </div>
           )}

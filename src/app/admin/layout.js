@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdDashboard, MdShoppingCart, MdPeople, MdCategory, MdExplore, MdTrendingUp, MdPhone, MdViewCarousel, MdReceipt, MdLocationOn } from 'react-icons/md';
+import { useSelector } from "react-redux";
+import Loader from "@/app/components/Loader";
+ 
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const productLoading = useSelector((state) => state.product?.loading);
+  const usersLoading = useSelector((state) => state.users?.loading);
+  const contactLoading = useSelector((state) => state.contacts?.loading);
+  const ordersLoading = useSelector((state) => state.orders?.loading);
+  const addressLoading = useSelector((state) => state.address?.loading);
+
+  const isAnyLoading = useMemo(() => Boolean(productLoading || usersLoading || contactLoading || ordersLoading || addressLoading), [productLoading, usersLoading, contactLoading, ordersLoading, addressLoading]);
+
+  
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: MdDashboard },
@@ -24,7 +37,6 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -32,7 +44,6 @@ export default function AdminLayout({ children }) {
         ></div>
       )}
 
-      {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } md:block`}>
@@ -55,9 +66,7 @@ export default function AdminLayout({ children }) {
         </nav>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-6 md:ml-0">
-        {/* Hamburger Menu for Mobile */}
         <button
           className="md:hidden fixed top-0 left-4 z-50 bg-white p-2 rounded shadow-lg"
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -68,6 +77,8 @@ export default function AdminLayout({ children }) {
         </button>
         {children}
       </div>
+
+      <Loader show={isAnyLoading} label="Please wait" />
     </div>
   );
 }

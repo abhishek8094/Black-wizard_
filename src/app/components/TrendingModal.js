@@ -1,63 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 
 const TrendingModal = ({ isOpen, onClose, onSubmit, isEdit, product, productsData }) => {
+  const [imagePreview, setImagePreview] = useState('');
+  const [subImgPreview, setSubImgPreview] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    size: '',
-    image: '',
-    subImg: ''
+    name: product?.name || product?.title || '',
+    description: product?.description || '',
+    price: product?.price || '',
+    category: product?.category || '',
+    size: product?.size || '',
+    image: null,
+    subImg: null
   });
 
   useEffect(() => {
-    if (isEdit && product) {
-      setFormData({
-        name: product.name || product.title || '',
-        description: product.description || '',
-        price: product.price || '',
-        category: product.category || '',
-        size: product.size || '',
-        image: product.image || '',
-        subImg: product.subImg || ''
-      });
-    } else {
-      setFormData({
-        name: '',
-        description: '',
-        price: '',
-        category: '',
-        size: '',
-        image: '',
-        subImg: ''
-      });
-    }
-  }, [isEdit, product, isOpen]);
+    // Sync form when editing a different product or opening
+    setFormData({
+      name: product?.name || product?.title || '',
+      description: product?.description || '',
+      price: product?.price || '',
+      category: product?.category || '',
+      size: product?.size || '',
+      image: null,
+      subImg: null
+    });
+    setImagePreview('');
+    setSubImgPreview('');
+  }, [product, isOpen]);
 
   if (!isOpen) return null;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, image: file }));
-    }
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setFormData((prev) => ({ ...prev, image: file }));
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubImgChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, subImg: file }));
-    }
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setFormData((prev) => ({ ...prev, subImg: file }));
+    setSubImgPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = (e) => {

@@ -13,8 +13,6 @@
     "axios": "^1.6.2",
     "bcryptjs": "^3.0.2",
     "cookies": "^0.9.1",
-
-    "flickity": "^3.0.0",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
