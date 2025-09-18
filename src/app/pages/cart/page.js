@@ -22,7 +22,6 @@ export default function CartPage() {
   const items = useSelector(selectCartItems);
   const totalPrice = useSelector(selectTotalPrice);
   const {addressesData} = useSelector((state) => state.address);
-  console.log(addressesData)
   const dispatch = useDispatch();
   const router = useRouter();
   const token = getToken();
@@ -53,13 +52,13 @@ export default function CartPage() {
       const orderData = {
         products,
         shippingAddress,
-        paymentMethod
+        paymentMethod 
       };
 
       // Dispatch addOrder to create the order
       try {
         const resultAction = await dispatch(addOrder(orderData));
-        console.log(resultAction)
+        console.log(resultAction,"hello")
         if (addOrder.fulfilled.match(resultAction)) {
           // Order created successfully
           const orderId = resultAction.payload.id; // Assuming the response has order ID
