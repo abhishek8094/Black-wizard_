@@ -10,7 +10,9 @@ function PaymentSuccessContent() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
+  console.log(paymentId)
   const orderId = searchParams.get("order_id");
+  console.log(orderId);
 
   const { addressesData } = useSelector((state) => state.address);
   const [orderDetails, setOrderDetails] = useState(null);
