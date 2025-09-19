@@ -20,10 +20,10 @@ export default function Settings() {
     }
   };
   return (
-    <div className="p-16 ">
-      <h2 className="text-2xl text-gray-700 font-semibold mb-6">Settings</h2>
+    <div className="p-4 sm:p-8 md:p-16">
+      <h2 className="text-xl sm:text-2xl text-gray-700 font-semibold mb-6">Settings</h2>
       <div className="flex flex-col md:flex-row md:space-x-6">
-        <div className="flex items-center p-6 rounded-lg mb-4 md:mb-0">
+      <div className="flex items-center p-4 sm:p-6 rounded-lg mb-4 md:mb-0">
           <FaLock className="text-gray-700 text-xl mr-3" />
           <div className="flex-1">
             <div className="text-lg font-semibold text-gray-700">
@@ -35,7 +35,7 @@ export default function Settings() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 h-20 px-8 shadow-lg rounded-lg bg-white border w-full">
+        <div className="flex items-center gap-3 h-20 px-4 sm:px-8 shadow-lg rounded-lg bg-white border w-full">
           <button
             onClick={handleLogOut}
             className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100 text-blue-600 font-medium"

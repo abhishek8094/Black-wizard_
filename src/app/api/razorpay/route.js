@@ -38,7 +38,7 @@ export async function POST(request) {
       });
     }
 
-    const { product, selectedSize, quantity, amount, cartItems } = await request.json();
+    const { product, amount } = await request.json();
 
     // Validate required fields
     if (!amount || amount <= 0) {
@@ -52,15 +52,12 @@ export async function POST(request) {
     const options = {
       amount: Math.round(amount*100),
       currency: 'INR',
-      receipt: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      receipt: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       notes: {
         productName: product?.name || 'Multiple items',
-        size: selectedSize || 'N/A',
-        quantity: quantity || 1,
-        cartItems: cartItems ? JSON.stringify(cartItems) : 'N/A',
         createdAt: new Date().toISOString(),
       },
-      payment_capture: 1, 
+      payment_capture: 1,
     };
 
 

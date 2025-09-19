@@ -2,6 +2,8 @@
 
 export const initiateRazorpayCheckout = (data) => {
 
+  console.log(data,"data-->")
+
   const userProfile = JSON.parse(localStorage.getItem("userProfile") || "{}");
 
   const firstName = userProfile.firstName || "";

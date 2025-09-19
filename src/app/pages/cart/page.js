@@ -16,7 +16,6 @@ import {
 } from "../../redux/slices/cartSlice";
 import { getToken } from "@/app/api/auth";
 import { fetchAddresses } from "../../redux/slices/addressSlice";
-import { addOrder } from "../../redux/slices/orderSlice";
 
 export default function CartPage() {
   const items = useSelector(selectCartItems);
@@ -25,87 +24,34 @@ export default function CartPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const token = getToken();
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("credit_card");
 
   const handleCheckout = async () => {
-    if (!paymentMethod) {
-      toast.error("Please select a payment method");
-      return;
-    }
-
     if (token) {
-      // Check if user has any addresses
-      if (!addressesData?.data || addressesData.data.length === 0) {
-        toast.error("Please add a shipping address before proceeding to checkout");
-        router.push("/account/user-profile");
-        return;
-      }
+      // Store cart items in localStorage before checkout
+      localStorage.setItem("checkoutItems", JSON.stringify(items));
+      const subtotal = totalPrice;
+      const shipping = 0; // Free shipping
+      const total = subtotal + shipping;
+      const orderSummary = { subtotal, shipping, total };
+      localStorage.setItem("orderSummary", JSON.stringify(orderSummary));
 
-      // Prepare order data using the provided JSON structure
-      const products = items.map(item => ({
-        product: item._id,
-        quantity: item.quantity
-      }));
+      const response = await fetch("/api/razorpay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          product: items,
+          amount: total,
+        }),
+      });
 
-      const defaultAddress = addressesData.data[0]._id
-      const shippingAddress = defaultAddress;
-      const orderData = {
-        products,
-        shippingAddress,
-        paymentMethod 
-      };
-
-      // Dispatch addOrder to create the order
-      try {
-        const resultAction = await dispatch(addOrder(orderData));
-        console.log(resultAction,"hello")
-        if (addOrder.fulfilled.match(resultAction)) {
-          // Order created successfully
-          const orderId = resultAction.payload.id; // Assuming the response has order ID
-
-          if (paymentMethod === "cod") {
-            // For Cash on Delivery, redirect to success page or show success message
-            toast.success("Order placed successfully! You will pay when the order is delivered.");
-            // Clear cart after successful order
-            items.forEach(item => {
-              dispatch(removeFromCart({ id: item._id, size: item.size }));
-            });
-            router.push("/"); // Redirect to home page
-          } else {
-            // For Razorpay, proceed with payment gateway
-            // Store cart items in localStorage before checkout
-            localStorage.setItem("checkoutItems", JSON.stringify(items));
-            const subtotal = totalPrice;
-            const shipping = 0; // Free shipping
-            const total = subtotal + shipping;
-            const orderSummary = { subtotal, shipping, total };
-            localStorage.setItem("orderSummary", JSON.stringify(orderSummary));
-
-            const response = await fetch("/api/razorpay", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                product: items,
-                amount: total,
-                orderId,
-              }),
-            });
-
-            const data = await response.json();
-            console.log("data",data);
-            if (data.success) {
-              initiateRazorpayCheckout(data);
-            } else {
-              console.error("Error creating Razorpay order:", data.error);
-            }
-          }
-        } else {
-          console.error("Failed to create order:", resultAction.payload);
-        }
-      } catch (error) {
-        console.error("Error during checkout:", error);
+      const data = await response.json();
+      if (data.success) {
+        initiateRazorpayCheckout(data);
+      } else {
+        console.error("Error creating Razorpay order:", data.error);
       }
     } else {
       router.push("/home/login");
@@ -244,42 +190,6 @@ export default function CartPage() {
                   <span>Total</span>
                   <span>₹{totalPrice}</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Payment Method Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Payment Method</h3>
-              <div className="space-y-2">
-                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="razorpay"
-                    checked={paymentMethod === "razorpay"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="mr-3 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex items-center">
-                    <span className="font-medium">Razorpay</span>
-                    <span className="ml-2 text-sm text-gray-500">(Cards, UPI, Net Banking)</span>
-                  </div>
-                </label>
-                
-                <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="mr-3 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex items-center">
-                    <span className="font-medium">Cash on Delivery</span>
-                    <span className="ml-2 text-sm text-gray-500">(Pay when delivered)</span>
-                  </div>
-                </label>
               </div>
             </div>
 

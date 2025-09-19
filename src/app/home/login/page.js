@@ -31,7 +31,7 @@ export default function LoginPage() {
       if(userRole === "admin"){
         route.push("/admin");
       } else {
-        route.push("/account");
+        route.push("/");
       }
     }
     if (result.type === "auth/appLogin/rejected") {
