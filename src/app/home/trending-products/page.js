@@ -1,8 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { trendingProducts } from "@/app/constant/constant";
-import { generateProductSlug } from "@/app/utils/slugify";
 import { useDispatch } from "react-redux";
 import { trendingProduct } from "@/app/redux/slices/productSlice";
 import { useSelector } from "react-redux";
@@ -20,7 +18,7 @@ export default function TrendingProducts() {
     router.push(`/collections/products/${id}`);
   };
   return (
-    <section className="pt-40 pb-20 bg-gray-50">
+    <section className="pt-2 pb-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">

@@ -10,9 +10,7 @@ function PaymentSuccessContent() {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
-  console.log(paymentId)
   const orderId = searchParams.get("order_id");
-  console.log(orderId);
 
   const { addressesData } = useSelector((state) => state.address);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -69,7 +67,7 @@ function PaymentSuccessContent() {
             phone: address.phone || "",
           },
           estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          items: items.length > 0 ? items : "No Product"
+          items: items
         });
         setLoading(false);
       }, 1000);
@@ -164,31 +162,35 @@ function PaymentSuccessContent() {
         {/* Order Summary */}
         <div className="border border-gray-300 rounded-md p-4 mb-6">
           <h3 className="font-semibold mb-3">Order Summary</h3>
-          {orderDetails?.items?.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center border border-gray-300 rounded-md p-2 mb-3"
-            >
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className="w-16 h-16 object-cover rounded-md mr-4"
-              />
-              <div className="flex-grow">
-                <p className="font-semibold">{item.name}</p>
-                <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+          {orderDetails?.items && orderDetails.items.length > 0 ? (
+            orderDetails.items.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center border border-gray-300 rounded-md p-2 mb-3"
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded-md mr-4"
+                />
+                <div className="flex-grow">
+                  <p className="font-semibold">{item.name}</p>
+                  <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-green-600 font-semibold">₹{item.price}</p>
+                  {/* <p className="text-xs line-through text-gray-400">
+                    ₹{item.originalPrice}
+                  </p>
+                  <span className="text-xs bg-green-100 text-green-600 rounded px-1 ml-1">
+                    {item.discountPercent}% off
+                  </span> */}
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-green-600 font-semibold">₹{item.price}</p>
-                {/* <p className="text-xs line-through text-gray-400">
-                  ₹{item.originalPrice}
-                </p>
-                <span className="text-xs bg-green-100 text-green-600 rounded px-1 ml-1">
-                  {item.discountPercent}% off
-                </span> */}
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No Product</p>
+          )}
 
           <div className="border-t border-gray-300 pt-3 space-y-1 text-sm">
             <div className="flex justify-between">
