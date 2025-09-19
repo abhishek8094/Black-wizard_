@@ -16,7 +16,6 @@ import {
 } from "../../redux/slices/cartSlice";
 import { getToken } from "@/app/api/auth";
 import { fetchAddresses } from "../../redux/slices/addressSlice";
-import { addOrder } from "../../redux/slices/orderSlice";
 
 export default function CartPage() {
   const items = useSelector(selectCartItems);
@@ -29,58 +28,30 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
     if (token) {
-      // Prepare order data using the provided JSON structure
-      const products = items.map(item => ({
-        product: item._id,
-        quantity: item.quantity
-      }));
+      // Store cart items in localStorage before checkout
+      localStorage.setItem("checkoutItems", JSON.stringify(items));
+      const subtotal = totalPrice;
+      const shipping = 0; // Free shipping
+      const total = subtotal + shipping;
+      const orderSummary = { subtotal, shipping, total };
+      localStorage.setItem("orderSummary", JSON.stringify(orderSummary));
 
-      const defaultAddress = addressesData.data[0]._id
-      const shippingAddress = defaultAddress;
-      const orderData = {
-        products,
-        shippingAddress,
-        paymentMethod
-      };
+      const response = await fetch("/api/razorpay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          product: items,
+          amount: total,
+        }),
+      });
 
-      // Dispatch addOrder to create the order
-      try {
-        const resultAction = await dispatch(addOrder(orderData));
-        if (addOrder.fulfilled.match(resultAction)) {
-          // Order created successfully, proceed to payment
-          const orderId = resultAction.payload.id; // Assuming the response has order ID
-
-          // Store cart items in localStorage before checkout
-          localStorage.setItem("checkoutItems", JSON.stringify(items));
-          const subtotal = totalPrice;
-          const shipping = 0; // Free shipping
-          const total = subtotal + shipping;
-          const orderSummary = { subtotal, shipping, total };
-          localStorage.setItem("orderSummary", JSON.stringify(orderSummary));
-
-          const response = await fetch("/api/razorpay", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              product: items,
-              amount: total,
-              orderId, 
-            }),
-          });
-
-          const data = await response.json();
-          if (data.success) {
-            initiateRazorpayCheckout(data);
-          } else {
-            console.error("Error creating Razorpay order:", data.error);
-          }
-        } else {
-          console.error("Failed to create order:", resultAction.payload);
-        }
-      } catch (error) {
-        console.error("Error during checkout:", error);
+      const data = await response.json();
+      if (data.success) {
+        initiateRazorpayCheckout(data);
+      } else {
+        console.error("Error creating Razorpay order:", data.error);
       }
     } else {
       router.push("/home/login");

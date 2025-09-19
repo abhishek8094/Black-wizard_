@@ -5,6 +5,8 @@ import Link from "next/link";
 import { FiCheckCircle } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAddresses } from "@/app/redux/slices/addressSlice";
+import { addOrder } from "@/app/redux/slices/orderSlice";
+import { clearCart } from "@/app/redux/slices/cartSlice";
 
 function PaymentSuccessContent() {
   const dispatch = useDispatch();
@@ -16,6 +18,7 @@ function PaymentSuccessContent() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [orderAdded, setOrderAdded] = useState(false);
 
   const getDefaultAddress = (data) => {
     if (!data?.data || !Array.isArray(data.data)) return null;
@@ -75,10 +78,36 @@ function PaymentSuccessContent() {
   }, [address, paymentId, orderId]);
 
   useEffect(() => {
-    // Clear cart and checkoutItems from localStorage after displaying order details
+    if (orderDetails && address && !orderAdded) {
+      const orderData = {
+        orderId: orderId,
+        products: orderDetails.items.map(item => ({
+          product: item._id,
+          quantity: item.quantity,
+        })),
+        shippingAddress: address._id,
+        paymentMethod: "razorpay", // Assuming razorpay as payment method
+        paymentId: paymentId,
+      };
+
+      dispatch(addOrder(orderData))
+        .unwrap()
+        .then(() => {
+          setOrderAdded(true);
+          console.log("Order added successfully");
+          dispatch(clearCart());
+          localStorage.removeItem("cartItems");
+        })
+        .catch((error) => {
+          console.error("Failed to add order:", error);
+        });
+    }
+  }, [orderDetails, address, orderAdded, dispatch, orderId, paymentId]);
+
+  useEffect(() => {
+    // Clear checkoutItems from localStorage after displaying order details
     if (orderDetails) {
       localStorage.removeItem("checkoutItems");
-      localStorage.removeItem("cartItems");
     }
   }, [orderDetails]);
 
